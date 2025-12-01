@@ -4,6 +4,8 @@ import { COOKIE_NAME } from "../shared/const";
 import { ENV } from "./_core/env";
 import { SignJWT, jwtVerify } from "jose";
 
+// Force rebuild: 2024-12-01
+
 const ADMIN_COOKIE = "maths6e_admin";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "secret");
 
