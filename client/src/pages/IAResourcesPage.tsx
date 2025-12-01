@@ -160,14 +160,28 @@ export default function IAResourcesPage() {
                 </p>
                 <div className="flex gap-[2vw] md:gap-2">
                   {objective.resources.video && (
-                    <span className="inline-flex items-center gap-1 text-[2.5vw] md:text-xs px-[2vw] py-[1vw] md:px-2 md:py-1 rounded-full bg-red-100 text-red-700">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedObjective(objective);
+                        setCurrentSlide("video");
+                      }}
+                      className="inline-flex items-center gap-1 text-[2.5vw] md:text-xs px-[2vw] py-[1vw] md:px-2 md:py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition-colors cursor-pointer"
+                    >
                       <Play className="w-[3vw] h-[3vw] md:w-3 md:h-3" /> Vidéo
-                    </span>
+                    </button>
                   )}
                   {objective.resources.image && (
-                    <span className="inline-flex items-center gap-1 text-[2.5vw] md:text-xs px-[2vw] py-[1vw] md:px-2 md:py-1 rounded-full bg-blue-100 text-blue-700">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedObjective(objective);
+                        setCurrentSlide("image");
+                      }}
+                      className="inline-flex items-center gap-1 text-[2.5vw] md:text-xs px-[2vw] py-[1vw] md:px-2 md:py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors cursor-pointer"
+                    >
                       <Image className="w-[3vw] h-[3vw] md:w-3 md:h-3" /> Illustration
-                    </span>
+                    </button>
                   )}
                 </div>
               </CardContent>
