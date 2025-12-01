@@ -1,8 +1,9 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock, Play, Image, FileDown, Bot } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock, Play, Image, FileDown, Bot, Gamepad2 } from "lucide-react";
 import { useState } from "react";
+import InteractiveExercise from "@/components/InteractiveExercise";
 
 // Structure détaillée des exercices avec les vrais énoncés
 const exercicesDetail: Record<string, {
@@ -382,6 +383,7 @@ export default function ExerciceDetailPage() {
   }>();
   const [modal, setModal] = useState<ModalContent>(null);
   const [iaModal, setIaModal] = useState<IAModalContent>(null);
+  const [showInteractive, setShowInteractive] = useState(false);
 
   const grandeur = chapterId ? grandeurs[chapterId] : null;
   const exercice = exerciceId ? exercicesDetail[exerciceId] : null;
@@ -568,8 +570,23 @@ export default function ExerciceDetailPage() {
         />
       )}
 
-      <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm">
+      {/* Mode interactif "À toi de jouer" */}
+      {showInteractive && exerciceId === "ex1" && (
+        <InteractiveExercise onClose={() => setShowInteractive(false)} />
+      )}
+
+      <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm flex items-center justify-center gap-[3vw] md:gap-4">
         <p>Mathématiques 6e - Collège Gaston Chaissac</p>
+        {exerciceId === "ex1" && (
+          <Button
+            onClick={() => setShowInteractive(true)}
+            size="sm"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 gap-1 text-[2.5vw] md:text-xs h-[6vw] md:h-8 px-[2vw] md:px-3"
+          >
+            <Gamepad2 className="w-[3vw] h-[3vw] md:w-3 md:h-3" />
+            À toi de jouer !
+          </Button>
+        )}
       </footer>
     </div>
   );
