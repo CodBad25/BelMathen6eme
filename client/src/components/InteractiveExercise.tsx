@@ -260,8 +260,8 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-[4vw] md:p-6">
-      <Card className="max-w-2xl w-full max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-black/70 z-50 overflow-y-auto p-[2vw] md:p-4">
+      <Card className="max-w-2xl mx-auto my-[2vh] md:my-4">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-[4vw] md:p-4">
           <div className="flex items-center justify-between">
