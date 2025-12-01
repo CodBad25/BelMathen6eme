@@ -2,7 +2,7 @@ import { useParams, Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Home, BookOpen, Bot } from "lucide-react";
+import { Home, BookOpen, Bot, GraduationCap } from "lucide-react";
 import { useFilteredResources } from "@/hooks/useFilteredResources";
 import { useClasse } from "@/contexts/ClasseContext";
 
@@ -11,6 +11,9 @@ const chaptersWithMethods = ["chapitre-2-prix"];
 
 // Chapitres qui ont des ressources IA disponibles
 const chaptersWithIA = ["chapitre-2-prix"];
+
+// Chapitres qui ont un cours interactif disponible
+const chaptersWithCours = ["chapitre-1-angles"];
 
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
   "chapitre-1-angles": { name: "Les Angles", icon: "📐", color: "from-indigo-500 to-blue-600" },
@@ -171,6 +174,14 @@ export default function ChapterPage() {
 
         <div className="mt-[1vh] md:mt-4 text-center space-y-2">
           <div className="flex flex-wrap justify-center gap-2">
+            {chapterId && chaptersWithCours.includes(chapterId) && (
+              <Link href={`${linkPrefix}/grandeur/${chapterId}/cours`}>
+                <Button variant="outline" className="gap-2 text-rose-700 border-rose-500 hover:bg-rose-50">
+                  <GraduationCap className="w-4 h-4" />
+                  Cours interactif
+                </Button>
+              </Link>
+            )}
             {chapterId && chaptersWithMethods.includes(chapterId) && (
               <Link href={`${linkPrefix}/grandeur/${chapterId}/methodes`}>
                 <Button variant="outline" className="gap-2 text-green-700 border-green-500 hover:bg-green-50">

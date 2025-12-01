@@ -18,6 +18,7 @@ import MethodeDetailPage from "./pages/MethodeDetailPage";
 import ExercicesPage from "./pages/ExercicesPage";
 import ExerciceDetailPage from "./pages/ExerciceDetailPage";
 import IAResourcesPage from "./pages/IAResourcesPage";
+import CoursDetailPage from "./pages/CoursDetailPage";
 
 // Wrapper pour les routes avec classe - extrait la classe du pathname
 function ClasseRoutes() {
@@ -40,6 +41,7 @@ function ClasseRoutes() {
         <Route path={`/${classe}/grandeur/:chapterId/methodes`} component={MethodesPage} />
         <Route path={`/${classe}/grandeur/:chapterId/methodes/:methodeId`} component={MethodeDetailPage} />
         <Route path={`/${classe}/grandeur/:chapterId/ia-ressources`} component={IAResourcesPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/cours`} component={CoursDetailPage} />
         <Route path={`/${classe}/grandeur/:chapterId/:sectionId/exercices`} component={ExercicesPage} />
         <Route path={`/${classe}/grandeur/:chapterId/:sectionId/exercices/:exerciceId`} component={ExerciceDetailPage} />
         <Route path={`/${classe}/grandeur/:chapterId/:sectionId`} component={SectionPage} />
@@ -67,6 +69,7 @@ function Router() {
         <Route path={"/grandeur/:chapterId/methodes"} component={MethodesPage} />
         <Route path={"/grandeur/:chapterId/methodes/:methodeId"} component={MethodeDetailPage} />
         <Route path={"/grandeur/:chapterId/ia-ressources"} component={IAResourcesPage} />
+        <Route path={"/grandeur/:chapterId/cours"} component={CoursDetailPage} />
         <Route path={"/grandeur/:chapterId/:sectionId/exercices"} component={ExercicesPage} />
         <Route path={"/grandeur/:chapterId/:sectionId/exercices/:exerciceId"} component={ExerciceDetailPage} />
         <Route path={"/grandeur/:chapterId/:sectionId"} component={SectionPage} />
