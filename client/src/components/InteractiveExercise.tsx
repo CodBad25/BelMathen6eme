@@ -232,12 +232,29 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
     montantChiffres: boolean | null;
     montantLettres: boolean | null;
   }>({ montantChiffres: null, montantLettres: null });
+  const [showPreviousAnswers, setShowPreviousAnswers] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const hasAnswered = results[currentQuestion.id] !== undefined;
 
-  // Récupérer les réponses du même groupe pour les afficher
+  // Récupérer toutes les réponses précédentes (pour consultation)
+  const getAllPreviousAnswers = () => {
+    return questions
+      .slice(0, currentQuestionIndex)
+      .filter(q => answers[q.id] !== undefined)
+      .map(q => ({
+        label: q.questionLabel,
+        question: q.question,
+        answer: answers[q.id],
+        isCorrect: results[q.id],
+        unit: q.unit || "",
+        correctAnswer: q.correctAnswer,
+        type: q.type,
+      }));
+  };
+
+  // Récupérer les réponses du même groupe pour les afficher automatiquement
   const getGroupAnswers = () => {
     if (!currentQuestion.group) return [];
 
@@ -306,6 +323,7 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
       setCurrentQuestionIndex(prev => prev + 1);
       setNumericInput("");
       setShowHint(false);
+      setShowPreviousAnswers(false);
       setChequeInputs({ montantChiffres: "", montantLettres: "" });
       setChequeResults({ montantChiffres: null, montantLettres: null });
     }
@@ -396,20 +414,56 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
           </div>
         </div>
 
-        {/* Contexte de l'exercice */}
-        <div className="bg-blue-50 border-b border-blue-200 p-[3vw] md:p-3">
+        {/* Contexte de l'exercice + bouton réponses précédentes */}
+        <div className="bg-blue-50 border-b border-blue-200 p-[3vw] md:p-3 flex items-center justify-between gap-2">
           <p className="text-[2.5vw] md:text-sm text-blue-800">
             <strong>⛽</strong>{" "}
-            <span className="font-mono bg-blue-100 px-1 rounded">Station 1 : 1,503 €/L</span>
+            <span className="font-mono bg-blue-100 px-1 rounded">St1: 1,503 €/L</span>
             {" • "}
-            <span className="font-mono bg-blue-100 px-1 rounded">Station 2 : 1,71 €/L</span>
+            <span className="font-mono bg-blue-100 px-1 rounded">St2: 1,71 €/L</span>
           </p>
+          {currentQuestionIndex > 0 && (
+            <button
+              onClick={() => setShowPreviousAnswers(!showPreviousAnswers)}
+              className="text-[2.5vw] md:text-xs text-blue-600 hover:text-blue-800 underline flex-shrink-0"
+            >
+              {showPreviousAnswers ? "Masquer" : "📝 Mes réponses"}
+            </button>
+          )}
         </div>
 
-        {/* Réponses intermédiaires du groupe */}
-        {groupAnswers.length > 0 && (
+        {/* Toutes les réponses précédentes (à la demande) */}
+        {showPreviousAnswers && currentQuestionIndex > 0 && (
+          <div className="bg-gray-50 border-b border-gray-200 p-[3vw] md:p-3 max-h-[30vh] overflow-y-auto">
+            <p className="text-[2.5vw] md:text-xs text-gray-500 mb-[2vw] md:mb-2 font-medium">📝 Toutes tes réponses :</p>
+            <div className="space-y-[2vw] md:space-y-2">
+              {getAllPreviousAnswers().map((pa, idx) => (
+                <div key={idx} className="flex items-start gap-[1vw] md:gap-2 text-[2.5vw] md:text-xs">
+                  {pa.isCorrect ? (
+                    <CheckCircle className="w-[3vw] h-[3vw] md:w-3 md:h-3 text-green-500 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <XCircle className="w-[3vw] h-[3vw] md:w-3 md:h-3 text-red-500 flex-shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <span className="text-purple-600 font-bold">{pa.label}</span>{" "}
+                    <span className="text-gray-600">{pa.question.substring(0, 50)}{pa.question.length > 50 ? "..." : ""}</span>
+                    <div className={`font-mono font-medium ${pa.isCorrect ? "text-green-700" : "text-red-700"}`}>
+                      → {pa.type === "cheque" ? "Chèque rempli" : `${pa.answer} ${pa.unit}`}
+                      {!pa.isCorrect && pa.correctAnswer && (
+                        <span className="text-gray-500 ml-2">(attendu: {pa.correctAnswer} {pa.unit})</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Réponses intermédiaires du groupe (affichées automatiquement) */}
+        {!showPreviousAnswers && groupAnswers.length > 0 && (
           <div className="bg-gray-50 border-b border-gray-200 p-[3vw] md:p-3">
-            <p className="text-[2.5vw] md:text-xs text-gray-600 mb-[1vw] md:mb-1 font-medium">📝 Tes réponses précédentes :</p>
+            <p className="text-[2.5vw] md:text-xs text-gray-600 mb-[1vw] md:mb-1 font-medium">📝 Pour ce calcul :</p>
             <div className="space-y-[1vw] md:space-y-1">
               {groupAnswers.map((ga, idx) => (
                 <div key={idx} className="flex items-center gap-[1vw] md:gap-2 text-[2.5vw] md:text-xs">
