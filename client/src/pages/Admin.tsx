@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -9,8 +9,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Eye, EyeOff, LogOut, Lock } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, LogOut, Lock, Users, Check } from "lucide-react";
 import { toast } from "sonner";
+
+// Classes actives sauvegardées dans localStorage
+const ACTIVE_CLASSES_KEY = "maths6e_active_classes";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
@@ -96,6 +99,35 @@ interface ChapterData {
 export default function Admin() {
   const { user, loading: authLoading, logout } = useAuth();
   const { data: resources, isLoading, error, refetch } = trpc.resources.list.useQuery();
+
+  // État des classes actives (sauvegardé dans localStorage)
+  const [activeClasses, setActiveClasses] = useState<string[]>(() => {
+    const saved = localStorage.getItem(ACTIVE_CLASSES_KEY);
+    return saved ? JSON.parse(saved) : ["6A", "6B", "6C", "6D"]; // Par défaut toutes actives
+  });
+
+  // Sauvegarder dans localStorage quand ça change
+  useEffect(() => {
+    localStorage.setItem(ACTIVE_CLASSES_KEY, JSON.stringify(activeClasses));
+  }, [activeClasses]);
+
+  const toggleActiveClass = (classe: string) => {
+    setActiveClasses(prev => {
+      if (prev.includes(classe)) {
+        // Ne pas désactiver si c'est la dernière classe active
+        if (prev.length === 1) {
+          toast.error("Vous devez garder au moins une classe active");
+          return prev;
+        }
+        toast.success(`Classe ${classe} désactivée`);
+        return prev.filter(c => c !== classe);
+      } else {
+        toast.success(`Classe ${classe} activée`);
+        return [...prev, classe];
+      }
+    });
+  };
+
   const toggleMutation = trpc.resources.toggleVisibility.useMutation({
     onSuccess: () => {
       refetch();
@@ -281,6 +313,80 @@ export default function Admin() {
       </header>
 
       <main className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Panneau des classes */}
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-600" />
+              <CardTitle className="text-lg text-blue-800">Mes classes cette année</CardTitle>
+            </div>
+            <CardDescription>
+              Cliquez sur une classe pour l'activer/désactiver. Seules les classes actives s'affichent ci-dessous.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {(["6A", "6B", "6C", "6D"] as const).map((classe) => {
+                const isActive = activeClasses.includes(classe);
+                return (
+                  <div
+                    key={classe}
+                    onClick={() => toggleActiveClass(classe)}
+                    className={`rounded-lg p-3 border shadow-sm cursor-pointer transition-all ${
+                      isActive
+                        ? "bg-white border-blue-300 hover:border-blue-400"
+                        : "bg-gray-100 border-gray-200 opacity-50 hover:opacity-75"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className={`font-bold text-lg ${isActive ? "text-blue-700" : "text-gray-400"}`}>
+                        {classe}
+                      </div>
+                      {isActive && (
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    {isActive ? (
+                      <>
+                        <div className="text-xs text-gray-500 text-center mt-1 break-all">
+                          belmathen6eme.vercel.app/{classe}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(`https://belmathen6eme.vercel.app/${classe}`);
+                            toast.success(`URL ${classe} copiée !`);
+                          }}
+                          className="w-full mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 py-1 px-2 rounded transition-colors"
+                        >
+                          Copier le lien
+                        </button>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-400 text-center mt-1">
+                        Cliquez pour activer
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 p-3 bg-white rounded-lg border">
+              <p className="text-sm text-gray-700 mb-2">
+                <strong>Comment ça marche ?</strong>
+              </p>
+              <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                <li>Cliquez sur une carte pour activer/désactiver une classe</li>
+                <li>Chaque élève accède avec l'URL de sa classe (ex: /6A)</li>
+                <li>Dans <Link href="/admin/gestion" className="text-blue-600 underline">Gérer</Link>, cliquez sur les boutons <span className="bg-blue-500 text-white px-1 rounded text-xs">A</span> <span className="bg-gray-200 text-gray-500 px-1 rounded text-xs">B</span> etc. pour activer/désactiver une ressource pour chaque classe</li>
+                <li>Une ressource doit d'abord être "Visible" (switch général) pour apparaître</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
         <Alert>
           <AlertDescription>
             Utilisez les interrupteurs ci-dessous pour activer ou désactiver la visibilité des

@@ -19,11 +19,14 @@ import ExercicesPage from "./pages/ExercicesPage";
 import ExerciceDetailPage from "./pages/ExerciceDetailPage";
 import IAResourcesPage from "./pages/IAResourcesPage";
 
-// Wrapper pour les routes avec classe
+// Wrapper pour les routes avec classe - extrait la classe du pathname
 function ClasseRoutes() {
-  const { classeId } = useParams<{ classeId: string }>();
+  // Extraire la classe depuis le pathname car le param ":rest*" ne donne pas la classe directement
+  const pathname = window.location.pathname;
+  const classeMatch = pathname.match(/^\/(6[A-D])/);
+  const classeId = classeMatch ? classeMatch[1] : null;
   const validClasses = ["6A", "6B", "6C", "6D"];
-  const classe = validClasses.includes(classeId) ? classeId as "6A" | "6B" | "6C" | "6D" : null;
+  const classe = classeId && validClasses.includes(classeId) ? classeId as "6A" | "6B" | "6C" | "6D" : null;
 
   if (!classe) {
     return <NotFound />;
@@ -32,16 +35,16 @@ function ClasseRoutes() {
   return (
     <ClasseProvider classe={classe}>
       <Switch>
-        <Route path={`/${classeId}`} component={Home} />
-        <Route path={`/${classeId}/grandeur/:chapterId`} component={ChapterPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/methodes`} component={MethodesPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/methodes/:methodeId`} component={MethodeDetailPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/ia-ressources`} component={IAResourcesPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/:sectionId/exercices`} component={ExercicesPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/:sectionId/exercices/:exerciceId`} component={ExerciceDetailPage} />
-        <Route path={`/${classeId}/grandeur/:chapterId/:sectionId`} component={SectionPage} />
-        <Route path={`/${classeId}/cours`} component={CoursEleves} />
-        <Route path={`/${classeId}/cours/:chapterId`} component={CoursEleves} />
+        <Route path={`/${classe}`} component={Home} />
+        <Route path={`/${classe}/grandeur/:chapterId`} component={ChapterPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/methodes`} component={MethodesPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/methodes/:methodeId`} component={MethodeDetailPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/ia-ressources`} component={IAResourcesPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/:sectionId/exercices`} component={ExercicesPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/:sectionId/exercices/:exerciceId`} component={ExerciceDetailPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/:sectionId`} component={SectionPage} />
+        <Route path={`/${classe}/cours`} component={CoursEleves} />
+        <Route path={`/${classe}/cours/:chapterId`} component={CoursEleves} />
         <Route component={NotFound} />
       </Switch>
     </ClasseProvider>

@@ -11,8 +11,16 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
+// Récupérer les classes actives depuis localStorage
+const ACTIVE_CLASSES_KEY = "maths6e_active_classes";
+const getActiveClasses = (): string[] => {
+  const saved = localStorage.getItem(ACTIVE_CLASSES_KEY);
+  return saved ? JSON.parse(saved) : ["6A", "6B", "6C", "6D"];
+};
+
 export default function AdminGestion() {
   const { user, loading: authLoading } = useAuth();
+  const [activeClasses] = useState<string[]>(getActiveClasses);
   const { data: resources, isLoading, refetch } = trpc.resources.list.useQuery();
   const toggleVisibility = trpc.resources.toggleVisibility.useMutation({
     onSuccess: () => {
@@ -27,8 +35,12 @@ export default function AdminGestion() {
     },
   });
   const toggleClassVisibility = trpc.resources.toggleClassVisibility.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       refetch();
+      toast.success(`Visibilité ${variables.classe} mise à jour`);
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
     },
   });
   const createMutation = trpc.resources.create.useMutation({
@@ -440,31 +452,35 @@ export default function AdminGestion() {
                                 }
                               />
                             </div>
-                            {/* Visibilité par classe */}
-                            <div className="flex items-center gap-1 border-l pl-2">
-                              {(["6A", "6B", "6C", "6D"] as const).map((classe) => {
-                                const field = `visible${classe}` as keyof typeof resource;
-                                const isVisible = resource[field] === "true";
-                                return (
-                                  <button
-                                    key={classe}
-                                    onClick={() => toggleClassVisibility.mutate({
-                                      id: resource.id,
-                                      classe,
-                                      visible: isVisible ? "false" : "true"
-                                    })}
-                                    className={`px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${
-                                      isVisible
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-gray-200 text-gray-500"
-                                    }`}
-                                    title={`${classe}: ${isVisible ? "visible" : "masqué"}`}
-                                  >
-                                    {classe.replace("6", "")}
-                                  </button>
-                                );
-                              })}
-                            </div>
+                            {/* Visibilité par classe - seulement les classes actives */}
+                            {activeClasses.length > 0 && (
+                              <div className="flex items-center gap-1 border-l pl-2">
+                                {(["6A", "6B", "6C", "6D"] as const)
+                                  .filter(classe => activeClasses.includes(classe))
+                                  .map((classe) => {
+                                    const field = `visible${classe}` as keyof typeof resource;
+                                    const isVisible = resource[field] === "true";
+                                    return (
+                                      <button
+                                        key={classe}
+                                        onClick={() => toggleClassVisibility.mutate({
+                                          id: resource.id,
+                                          classe,
+                                          visible: isVisible ? "false" : "true"
+                                        })}
+                                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${
+                                          isVisible
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-200 text-gray-500"
+                                        }`}
+                                        title={`${classe}: ${isVisible ? "visible" : "masqué"}`}
+                                      >
+                                        {classe.replace("6", "")}
+                                      </button>
+                                    );
+                                  })}
+                              </div>
+                            )}
                             <Button
                               size="sm"
                               variant="ghost"
