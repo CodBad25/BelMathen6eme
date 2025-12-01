@@ -4,10 +4,13 @@ import { getSchoolYear } from "@shared/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Home, ArrowLeft, BookOpen } from "lucide-react";
+import { Home, ArrowLeft, BookOpen, Bot } from "lucide-react";
 
 // Chapitres qui ont des méthodes disponibles
 const chaptersWithMethods = ["chapitre-2-prix"];
+
+// Chapitres qui ont des ressources IA disponibles
+const chaptersWithIA = ["chapitre-2-prix"];
 
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
   "chapitre-1-angles": { name: "Les Angles", icon: "📐", color: "from-indigo-500 to-blue-600" },
@@ -158,14 +161,24 @@ export default function ChapterPage() {
         )}
 
         <div className="mt-[1vh] md:mt-4 text-center space-y-2">
-          {chapterId && chaptersWithMethods.includes(chapterId) && (
-            <Link href={`/grandeur/${chapterId}/methodes`}>
-              <Button variant="outline" className="gap-2 text-green-700 border-green-500 hover:bg-green-50">
-                <BookOpen className="w-4 h-4" />
-                Méthodes du chapitre
-              </Button>
-            </Link>
-          )}
+          <div className="flex flex-wrap justify-center gap-2">
+            {chapterId && chaptersWithMethods.includes(chapterId) && (
+              <Link href={`/grandeur/${chapterId}/methodes`}>
+                <Button variant="outline" className="gap-2 text-green-700 border-green-500 hover:bg-green-50">
+                  <BookOpen className="w-4 h-4" />
+                  Méthodes du chapitre
+                </Button>
+              </Link>
+            )}
+            {chapterId && chaptersWithIA.includes(chapterId) && (
+              <Link href={`/grandeur/${chapterId}/ia-ressources`}>
+                <Button variant="outline" className="gap-2 text-indigo-700 border-indigo-500 hover:bg-indigo-50">
+                  <Bot className="w-4 h-4" />
+                  Mon AMIE IA MAIS...
+                </Button>
+              </Link>
+            )}
+          </div>
           <div>
             <Link href={`/cours/${chapterId}`}>
               <span className="text-[3vw] md:text-base text-purple-600 hover:text-purple-800 font-medium underline cursor-pointer">

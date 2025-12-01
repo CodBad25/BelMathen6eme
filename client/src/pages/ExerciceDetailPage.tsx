@@ -1,7 +1,7 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock, Play, Image, FileDown, Bot } from "lucide-react";
 import { useState } from "react";
 
 // Structure détaillée des exercices avec les vrais énoncés
@@ -17,6 +17,10 @@ const exercicesDetail: Record<string, {
     correctionImages?: string[];
     correctionText?: string;
     methodeId?: string;
+    iaResources?: {
+      video?: string;
+      image?: string;
+    };
   }[];
 }> = {
   "ex1": {
@@ -34,7 +38,11 @@ const exercicesDetail: Record<string, {
           <p>Quelle est la station la moins chère ? Quelle est la différence de prix entre les deux stations ?</p>
         ),
         correctionImages: ["/exercices/prix/ex1/ex1_a_1.png", "/exercices/prix/ex1/ex1_a_2.png"],
-        methodeId: "M2.1"
+        methodeId: "M2.1",
+        iaResources: {
+          video: "/ia-ressources/ex1/video_comparer_decimaux.mp4",
+          image: "/ia-ressources/ex1/comparer_nombres_q1a.png",
+        }
       },
       {
         id: "b",
@@ -43,7 +51,11 @@ const exercicesDetail: Record<string, {
           <p>Je dois mettre <strong>10 ℓ</strong> de gazole dans ma voiture, quelle sera la différence entre les prix à payer ? Si je donne <strong>20 €</strong> au pompiste, calcule la monnaie rendue dans chaque station.</p>
         ),
         correctionImages: ["/exercices/prix/ex1/6A_Correction 1_1.png", "/exercices/prix/ex1/6A_Correction 1_2.png"],
-        methodeId: "M2.2"
+        methodeId: "M2.2",
+        iaResources: {
+          video: "/ia-ressources/ex1/video_difference_prix.mp4",
+          image: "/ia-ressources/ex1/ecart_prix_q1b.png",
+        }
       },
       {
         id: "c",
@@ -268,6 +280,97 @@ type ModalContent = {
   question: typeof exercicesDetail["ex1"]["questions"][0];
 } | null;
 
+type IAModalContent = {
+  questionLabel: string;
+  video?: string;
+  image?: string;
+} | null;
+
+// Composant Modal IA avec onglets
+function IAModal({ iaModal, exerciceTitle, onClose }: {
+  iaModal: NonNullable<IAModalContent>;
+  exerciceTitle: string;
+  onClose: () => void;
+}) {
+  const [activeTab, setActiveTab] = useState<"video" | "image">(iaModal.video ? "video" : "image");
+
+  return (
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-[4vw] md:p-6" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-[4vw] md:p-4 flex items-center justify-between">
+          <div className="flex items-center gap-[2vw] md:gap-3">
+            <Bot className="w-[5vw] h-[5vw] md:w-6 md:h-6" />
+            <div>
+              <h3 className="font-bold text-[4vw] md:text-lg">Mon AMIE IA MAIS...</h3>
+              <p className="text-[2.5vw] md:text-xs opacity-80">{exerciceTitle} - Question {iaModal.questionLabel}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full">
+            <X className="w-[5vw] h-[5vw] md:w-6 md:h-6" />
+          </button>
+        </div>
+
+        {/* Avertissement */}
+        <div className="bg-amber-50 border-b border-amber-200 px-[4vw] py-[2vw] md:px-4 md:py-2">
+          <p className="text-[2.5vw] md:text-xs text-amber-800 italic">
+            ⚠️ Attention : cette ressource a été générée par une IA. N'hésite pas à en parler avec ton prof si tu as un doute !
+          </p>
+        </div>
+
+        {/* Onglets si vidéo ET image disponibles */}
+        {iaModal.video && iaModal.image && (
+          <div className="flex border-b">
+            <button
+              onClick={() => setActiveTab("video")}
+              className={`flex-1 flex items-center justify-center gap-[1.5vw] md:gap-2 py-[2vw] md:py-3 text-[3vw] md:text-sm font-medium transition-colors ${
+                activeTab === "video"
+                  ? "bg-red-50 text-red-700 border-b-2 border-red-500"
+                  : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              <Play className="w-[3.5vw] h-[3.5vw] md:w-4 md:h-4" />
+              Vidéo
+            </button>
+            <button
+              onClick={() => setActiveTab("image")}
+              className={`flex-1 flex items-center justify-center gap-[1.5vw] md:gap-2 py-[2vw] md:py-3 text-[3vw] md:text-sm font-medium transition-colors ${
+                activeTab === "image"
+                  ? "bg-blue-50 text-blue-700 border-b-2 border-blue-500"
+                  : "text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              <Image className="w-[3.5vw] h-[3.5vw] md:w-4 md:h-4" />
+              Illustration
+            </button>
+          </div>
+        )}
+
+        {/* Contenu */}
+        <div className="flex-1 overflow-auto p-[4vw] md:p-6 bg-gray-900 flex items-center justify-center">
+          {activeTab === "video" && iaModal.video ? (
+            <video
+              src={iaModal.video}
+              controls
+              autoPlay
+              className="max-w-full max-h-[60vh] rounded-lg"
+            />
+          ) : iaModal.image ? (
+            <img
+              src={iaModal.image}
+              alt="Illustration IA"
+              className="max-w-full max-h-[60vh] rounded-lg"
+            />
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ExerciceDetailPage() {
   const { chapterId, sectionId, exerciceId } = useParams<{
     chapterId: string;
@@ -275,6 +378,7 @@ export default function ExerciceDetailPage() {
     exerciceId: string
   }>();
   const [modal, setModal] = useState<ModalContent>(null);
+  const [iaModal, setIaModal] = useState<IAModalContent>(null);
 
   const grandeur = chapterId ? grandeurs[chapterId] : null;
   const exercice = exerciceId ? exercicesDetail[exerciceId] : null;
@@ -386,6 +490,21 @@ export default function ExerciceDetailPage() {
                       </div>
                     )
                   )}
+
+                  {/* Bouton IA "Mon AMIE IA MAIS..." */}
+                  {question.iaResources && (
+                    <button
+                      onClick={() => setIaModal({
+                        questionLabel: question.label,
+                        video: question.iaResources?.video,
+                        image: question.iaResources?.image,
+                      })}
+                      className="flex items-center gap-[1.5vw] md:gap-2 px-[2.5vw] py-[1.5vw] md:px-3 md:py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full transition-colors text-[3vw] md:text-sm font-medium"
+                    >
+                      <Bot className="w-[3.5vw] h-[3.5vw] md:w-4 md:h-4" />
+                      Mon AMIE IA MAIS...
+                    </button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -435,6 +554,15 @@ export default function ExerciceDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal IA "Mon AMIE IA MAIS..." */}
+      {iaModal && (
+        <IAModal
+          iaModal={iaModal}
+          exerciceTitle={exercice.title}
+          onClose={() => setIaModal(null)}
+        />
       )}
 
       <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm">

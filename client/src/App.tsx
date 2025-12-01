@@ -16,6 +16,7 @@ import MethodesPage from "./pages/MethodesPage";
 import MethodeDetailPage from "./pages/MethodeDetailPage";
 import ExercicesPage from "./pages/ExercicesPage";
 import ExerciceDetailPage from "./pages/ExerciceDetailPage";
+import IAResourcesPage from "./pages/IAResourcesPage";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/grandeur/:chapterId"} component={ChapterPage} />
       <Route path={"/grandeur/:chapterId/methodes"} component={MethodesPage} />
       <Route path={"/grandeur/:chapterId/methodes/:methodeId"} component={MethodeDetailPage} />
+      <Route path={"/grandeur/:chapterId/ia-ressources"} component={IAResourcesPage} />
       <Route path={"/grandeur/:chapterId/:sectionId/exercices"} component={ExercicesPage} />
       <Route path={"/grandeur/:chapterId/:sectionId/exercices/:exerciceId"} component={ExerciceDetailPage} />
       <Route path={"/grandeur/:chapterId/:sectionId"} component={SectionPage} />
