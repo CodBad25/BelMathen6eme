@@ -34,6 +34,11 @@ export const resources = pgTable("resources", {
   url: text("url").notNull(),
   icon: text("icon"),
   visible: visibleEnum("visible").default("false").notNull(),
+  // Visibilité par classe (4 classes max)
+  visible6A: visibleEnum("visible6A").default("true").notNull(),
+  visible6B: visibleEnum("visible6B").default("true").notNull(),
+  visible6C: visibleEnum("visible6C").default("true").notNull(),
+  visible6D: visibleEnum("visible6D").default("true").notNull(),
   order: integer("order").notNull(),
   displayOrder: integer("displayOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),

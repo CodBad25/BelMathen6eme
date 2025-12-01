@@ -95,6 +95,20 @@ export const appRouter = router({
       const { getAllResources } = await import("./db");
       return getAllResources();
     }),
+    toggleClassVisibility: protectedProcedure
+      .input(z.object({
+        id: z.string(),
+        classe: z.enum(["6A", "6B", "6C", "6D"]),
+        visible: z.enum(["true", "false"])
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        const { updateClassVisibility } = await import("./db");
+        await updateClassVisibility(input.id, input.classe, input.visible);
+        return { success: true };
+      }),
     toggleVisibility: protectedProcedure
       .input(z.object({ id: z.string(), visible: z.enum(["true", "false"]) }))
       .mutation(async ({ input, ctx }) => {

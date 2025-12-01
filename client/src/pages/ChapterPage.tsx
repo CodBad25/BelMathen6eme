@@ -1,10 +1,10 @@
 import { useParams, Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { getSchoolYear } from "@shared/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Home, ArrowLeft, BookOpen, Bot } from "lucide-react";
+import { Home, BookOpen, Bot } from "lucide-react";
+import { useFilteredResources } from "@/hooks/useFilteredResources";
+import { useClasse } from "@/contexts/ClasseContext";
 
 // Chapitres qui ont des méthodes disponibles
 const chaptersWithMethods = ["chapitre-2-prix"];
@@ -62,15 +62,19 @@ const sectionsByChapter: Record<string, Array<{ id: string; name: string; icon: 
 
 export default function ChapterPage() {
   const { chapterId } = useParams<{ chapterId: string }>();
-  const { data: resources, isLoading } = trpc.resources.list.useQuery();
+  const { resources, isLoading } = useFilteredResources();
+  const { classe, isClasseView } = useClasse();
+
+  // Préfixe pour les liens selon la classe
+  const linkPrefix = isClasseView ? `/${classe}` : "";
 
   const grandeur = chapterId ? grandeurs[chapterId] : null;
   const sections = chapterId ? sectionsByChapter[chapterId] || [] : [];
 
-  // Compter les ressources par section pour ce chapitre
+  // Compter les ressources par section pour ce chapitre (déjà filtré par classe)
   const sectionCounts: Record<string, number> = {};
   resources?.forEach((r) => {
-    if (r.chapterId === chapterId && r.visible === "true") {
+    if (r.chapterId === chapterId) {
       sectionCounts[r.sectionId] = (sectionCounts[r.sectionId] || 0) + 1;
     }
   });
@@ -112,7 +116,7 @@ export default function ChapterPage() {
         <div className="max-w-6xl mx-auto">
           <p className="text-[2vw] md:text-sm opacity-75 text-center">Réalisé avec ❤️ par M.BELHAJ</p>
           <div className="flex items-center gap-[2vw] md:gap-3">
-            <Link href="/">
+            <Link href={`${linkPrefix}/`}>
               <Button variant="secondary" size="sm" className="flex-shrink-0 h-[8vw] w-[8vw] md:h-auto md:w-auto p-0 md:px-3">
                 <Home className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
                 <span className="hidden md:inline md:ml-1">Accueil</span>
@@ -141,7 +145,7 @@ export default function ChapterPage() {
         ) : (
           <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-[2vw] md:gap-4 content-center">
             {availableSections.map((section) => (
-              <Link key={section.id} href={`/grandeur/${chapterId}/${section.id}`}>
+              <Link key={section.id} href={`${linkPrefix}/grandeur/${chapterId}/${section.id}`}>
                 <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden h-full">
                   <div className={`bg-gradient-to-br ${section.color} p-[2vw] md:p-4 text-center`}>
                     <span className="text-[8vw] md:text-4xl">{section.icon}</span>
@@ -163,7 +167,7 @@ export default function ChapterPage() {
         <div className="mt-[1vh] md:mt-4 text-center space-y-2">
           <div className="flex flex-wrap justify-center gap-2">
             {chapterId && chaptersWithMethods.includes(chapterId) && (
-              <Link href={`/grandeur/${chapterId}/methodes`}>
+              <Link href={`${linkPrefix}/grandeur/${chapterId}/methodes`}>
                 <Button variant="outline" className="gap-2 text-green-700 border-green-500 hover:bg-green-50">
                   <BookOpen className="w-4 h-4" />
                   Méthodes du chapitre
@@ -171,7 +175,7 @@ export default function ChapterPage() {
               </Link>
             )}
             {chapterId && chaptersWithIA.includes(chapterId) && (
-              <Link href={`/grandeur/${chapterId}/ia-ressources`}>
+              <Link href={`${linkPrefix}/grandeur/${chapterId}/ia-ressources`}>
                 <Button variant="outline" className="gap-2 text-indigo-700 border-indigo-500 hover:bg-indigo-50">
                   <Bot className="w-4 h-4" />
                   Mon AMIE IA MAIS...
@@ -180,7 +184,7 @@ export default function ChapterPage() {
             )}
           </div>
           <div>
-            <Link href={`/cours/${chapterId}`}>
+            <Link href={`${linkPrefix}/cours/${chapterId}`}>
               <span className="text-[3vw] md:text-base text-purple-600 hover:text-purple-800 font-medium underline cursor-pointer">
                 Voir toutes les ressources
               </span>

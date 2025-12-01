@@ -103,6 +103,24 @@ export async function updateResourceVisibility(id: string, visible: "true" | "fa
   await db.update(resources).set({ visible }).where(eq(resources.id, id));
 }
 
+export async function updateClassVisibility(
+  id: string,
+  classe: "6A" | "6B" | "6C" | "6D",
+  visible: "true" | "false"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  const fieldMap = {
+    "6A": { visible6A: visible },
+    "6B": { visible6B: visible },
+    "6C": { visible6C: visible },
+    "6D": { visible6D: visible },
+  };
+
+  await db.update(resources).set(fieldMap[classe]).where(eq(resources.id, id));
+}
+
 export async function createResource(data: {
   chapterId: string;
   sectionId: string;

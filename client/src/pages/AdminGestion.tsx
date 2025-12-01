@@ -26,6 +26,11 @@ export default function AdminGestion() {
       toast.success("Chapitre modifié");
     },
   });
+  const toggleClassVisibility = trpc.resources.toggleClassVisibility.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
   const createMutation = trpc.resources.create.useMutation({
     onSuccess: () => {
       refetch();
@@ -425,12 +430,41 @@ export default function AdminGestion() {
                         </div>
                         {!selectMode && (
                           <div className="flex items-center gap-3">
-                            <Switch
-                              checked={resource.visible === "true"}
-                              onCheckedChange={(checked) =>
-                                toggleVisibility.mutate({ id: resource.id, visible: checked ? "true" : "false" })
-                              }
-                            />
+                            {/* Visibilité générale */}
+                            <div className="flex items-center gap-1" title="Visibilité générale">
+                              <span className="text-xs text-gray-500">Vis</span>
+                              <Switch
+                                checked={resource.visible === "true"}
+                                onCheckedChange={(checked) =>
+                                  toggleVisibility.mutate({ id: resource.id, visible: checked ? "true" : "false" })
+                                }
+                              />
+                            </div>
+                            {/* Visibilité par classe */}
+                            <div className="flex items-center gap-1 border-l pl-2">
+                              {(["6A", "6B", "6C", "6D"] as const).map((classe) => {
+                                const field = `visible${classe}` as keyof typeof resource;
+                                const isVisible = resource[field] === "true";
+                                return (
+                                  <button
+                                    key={classe}
+                                    onClick={() => toggleClassVisibility.mutate({
+                                      id: resource.id,
+                                      classe,
+                                      visible: isVisible ? "false" : "true"
+                                    })}
+                                    className={`px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${
+                                      isVisible
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-200 text-gray-500"
+                                    }`}
+                                    title={`${classe}: ${isVisible ? "visible" : "masqué"}`}
+                                  >
+                                    {classe.replace("6", "")}
+                                  </button>
+                                );
+                              })}
+                            </div>
                             <Button
                               size="sm"
                               variant="ghost"

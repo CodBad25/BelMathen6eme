@@ -3,6 +3,7 @@ import { getSchoolYear } from "@shared/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { useClasse } from "@/contexts/ClasseContext";
 
 // Icône personnalisée pour les Aires (quadrillage avec un carreau coloré)
 const AireIcon = ({ className }: { className?: string }) => (
@@ -46,6 +47,10 @@ const citations = [
 export default function Home() {
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
   const [citation] = useState(() => citations[Math.floor(Math.random() * citations.length)]);
+  const { classe, isClasseView } = useClasse();
+
+  // Préfixe pour les liens selon la classe
+  const linkPrefix = isClasseView ? `/${classe}` : "";
 
   // Compteur de visites côté serveur
   const { data: visitData } = trpc.stats.getVisitCount.useQuery();
@@ -71,7 +76,9 @@ export default function Home() {
       <header className="bg-gradient-to-r from-blue-400 to-purple-400 text-white py-[3vh] md:py-8 px-4 shadow-lg">
         <div className="max-w-7xl mx-auto text-center space-y-[0.5vh] md:space-y-2">
           <p className="text-[2.5vw] md:text-base opacity-80">Réalisé avec <span className="inline-block animate-pulse text-[3vw] md:text-lg">❤️</span> par M.BELHAJ</p>
-          <h1 className="text-[8vw] md:text-5xl font-bold">Mathématiques 6e</h1>
+          <h1 className="text-[8vw] md:text-5xl font-bold">
+            Mathématiques 6e{isClasseView && ` - ${classe}`}
+          </h1>
           <p className="text-[3.5vw] md:text-xl opacity-90">Collège Gaston Chaissac - {getSchoolYear()}</p>
         </div>
       </header>
@@ -88,7 +95,7 @@ export default function Home() {
 
         <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-[1.5vw] md:gap-4 content-center">
           {grandeurs.map((grandeur, index) => (
-            <Link key={grandeur.id} href={`/grandeur/${grandeur.id}`}>
+            <Link key={grandeur.id} href={`${linkPrefix}/grandeur/${grandeur.id}`}>
               <div
                 className={`group cursor-pointer transition-all duration-500 h-[22vw] md:h-36
                   ${visibleCards.includes(index)
@@ -137,7 +144,7 @@ export default function Home() {
         </div>
 
         <div className="mt-[1vh] md:mt-4 text-center space-y-1">
-          <Link href="/cours">
+          <Link href={`${linkPrefix}/cours`}>
             <span className="text-[3vw] md:text-base text-purple-600 hover:text-purple-800 font-medium underline cursor-pointer">
               Voir tous les chapitres
             </span>
@@ -152,12 +159,14 @@ export default function Home() {
       </main>
 
       <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm relative">
-        <p>Mathématiques 6e - Collège Gaston Chaissac</p>
-        <Link href="/admin">
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 cursor-pointer text-[3vw] md:text-base">
-            🔒
-          </span>
-        </Link>
+        <p>Mathématiques 6e{isClasseView && ` - ${classe}`} - Collège Gaston Chaissac</p>
+        {!isClasseView && (
+          <Link href="/admin">
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 cursor-pointer text-[3vw] md:text-base">
+              🔒
+            </span>
+          </Link>
+        )}
       </footer>
     </div>
   );

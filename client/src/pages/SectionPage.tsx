@@ -1,9 +1,10 @@
 import { useParams, Link, useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft } from "lucide-react";
+import { useFilteredResources } from "@/hooks/useFilteredResources";
+import { useClasse } from "@/contexts/ClasseContext";
 
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
   "chapitre-1-angles": { name: "Les Angles", icon: "📐", color: "from-indigo-500 to-blue-600" },
@@ -55,13 +56,17 @@ const sectionsByChapter: Record<string, Record<string, { name: string; icon: str
 
 export default function SectionPage() {
   const { chapterId, sectionId } = useParams<{ chapterId: string; sectionId: string }>();
-  const { data: resources, isLoading } = trpc.resources.list.useQuery();
+  const { resources, allResources, isLoading } = useFilteredResources();
+  const { classe, isClasseView } = useClasse();
   const [, navigate] = useLocation();
+
+  // Préfixe pour les liens selon la classe
+  const linkPrefix = isClasseView ? `/${classe}` : "";
 
   const openResource = (resource: { type: string; url: string; title: string }) => {
     // Si c'est la carte "Exercices", naviguer vers la page interactive
     if (resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice")) {
-      navigate(`/grandeur/${chapterId}/${sectionId}/exercices`);
+      navigate(`${linkPrefix}/grandeur/${chapterId}/${sectionId}/exercices`);
       return;
     }
     // Ouvrir directement dans un nouvel onglet - le navigateur gère l'affichage et l'impression
@@ -72,7 +77,7 @@ export default function SectionPage() {
   const section = (chapterId && sectionId) ? sectionsByChapter[chapterId]?.[sectionId] : null;
 
   const sectionResources = resources?.filter(
-    (r) => r.chapterId === chapterId && r.sectionId === sectionId && r.visible === "true"
+    (r) => r.chapterId === chapterId && r.sectionId === sectionId
   ) || [];
 
   if (isLoading) {
@@ -109,7 +114,7 @@ export default function SectionPage() {
         <div className="max-w-4xl mx-auto">
           <p className="text-[2vw] md:text-sm opacity-75 text-center">Réalisé avec ❤️ par M.BELHAJ</p>
           <div className="flex items-center gap-[2vw] md:gap-3">
-            <Link href={`/grandeur/${chapterId}`}>
+            <Link href={`${linkPrefix}/grandeur/${chapterId}`}>
               <Button variant="secondary" size="sm" className="flex-shrink-0 h-[8vw] w-[8vw] md:h-auto md:w-auto p-0 md:px-3">
                 <ArrowLeft className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
                 <span className="hidden md:inline md:ml-1">Retour</span>
@@ -134,9 +139,9 @@ export default function SectionPage() {
         ) : (
           <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-[1.5vw] md:gap-3 content-center">
             {sectionResources.map((resource) => {
-              // Trouver la correction associée si elle existe
+              // Trouver la correction associée si elle existe (dans toutes les ressources)
               const correction = resource.correctionId
-                ? resources?.find(r => r.id === resource.correctionId)
+                ? allResources?.find(r => r.id === resource.correctionId)
                 : null;
               // Afficher le bouton C seulement si la correction est visible
               const showCorrectionButton = correction && correction.visible === "true";
