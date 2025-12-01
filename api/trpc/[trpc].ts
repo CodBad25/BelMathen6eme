@@ -23,6 +23,11 @@ const resources = pgTable("resources", {
   url: text("url").notNull(),
   icon: text("icon"),
   visible: visibleEnum("visible").default("false").notNull(),
+  // Visibilité par classe
+  visible6A: visibleEnum("visible6A").default("true").notNull(),
+  visible6B: visibleEnum("visible6B").default("true").notNull(),
+  visible6C: visibleEnum("visible6C").default("true").notNull(),
+  visible6D: visibleEnum("visible6D").default("true").notNull(),
   order: integer("order").notNull(),
   displayOrder: integer("displayOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
@@ -30,7 +35,7 @@ const resources = pgTable("resources", {
 });
 
 // Constants
-const ADMIN_COOKIE = "maths4e_admin";
+const ADMIN_COOKIE = "maths6e_admin";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "secret");
 
 // Database
@@ -137,6 +142,30 @@ const appRouter = t.router({
         await db.update(resources)
           .set({ visible: input.visible })
           .where(eq(resources.chapterId, input.chapterId));
+        return { success: true };
+      }),
+
+    // Toggle visibility for a specific class
+    toggleClassVisibility: publicProcedure
+      .input(z.object({
+        id: z.string(),
+        classe: z.enum(["6A", "6B", "6C", "6D"]),
+        visible: z.enum(["true", "false"])
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.isAdmin) {
+          throw new Error("Unauthorized");
+        }
+        const db = getDb();
+        const fieldMap: Record<string, Record<string, string>> = {
+          "6A": { visible6A: input.visible },
+          "6B": { visible6B: input.visible },
+          "6C": { visible6C: input.visible },
+          "6D": { visible6D: input.visible },
+        };
+        await db.update(resources)
+          .set(fieldMap[input.classe])
+          .where(eq(resources.id, input.id));
         return { success: true };
       }),
 
