@@ -282,20 +282,23 @@ export default function IAResourcesPage() {
 
             {/* Contenu */}
             <div className="max-w-4xl w-full">
-              {currentSlide === "video" && selectedObjective.resources.video ? (
+              {currentSlide === "video" && selectedObjective.resources.video && (
                 <video
+                  key={`video-${selectedObjective.id}`}
                   src={selectedObjective.resources.video}
                   controls
                   autoPlay
                   className="w-full max-h-[70vh] rounded-xl"
                 />
-              ) : currentSlide === "image" && selectedObjective.resources.image ? (
+              )}
+              {currentSlide === "image" && selectedObjective.resources.image && (
                 <img
+                  key={`image-${selectedObjective.id}`}
                   src={selectedObjective.resources.image}
                   alt={selectedObjective.title}
                   className="w-full max-h-[70vh] object-contain rounded-xl"
                 />
-              ) : null}
+              )}
             </div>
 
             {/* Flèche droite */}

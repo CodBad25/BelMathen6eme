@@ -351,20 +351,23 @@ function IAModal({ iaModal, exerciceTitle, onClose }: {
 
         {/* Contenu */}
         <div className="flex-1 overflow-auto p-[4vw] md:p-6 bg-gray-900 flex items-center justify-center">
-          {activeTab === "video" && iaModal.video ? (
+          {activeTab === "video" && iaModal.video && (
             <video
+              key={`video-${iaModal.questionLabel}`}
               src={iaModal.video}
               controls
               autoPlay
               className="max-w-full max-h-[60vh] rounded-lg"
             />
-          ) : iaModal.image ? (
+          )}
+          {activeTab === "image" && iaModal.image && (
             <img
+              key={`image-${iaModal.questionLabel}`}
               src={iaModal.image}
               alt="Illustration IA"
               className="max-w-full max-h-[60vh] rounded-lg"
             />
-          ) : null}
+          )}
         </div>
       </div>
     </div>
