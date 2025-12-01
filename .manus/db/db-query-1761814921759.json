@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, title, chapterId FROM resources WHERE title LIKE '%Durées%' OR title LIKE '%DURÉES%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 45WcYVoGoV7qkUB.root --database N8nfeXx5Eou9K4bQZyT4Qp --execute SELECT id, title, chapterId FROM resources WHERE title LIKE '%Durées%' OR title LIKE '%DURÉES%'",
+  "rows": [
+    {
+      "id": "ch6-durees-videos",
+      "title": "Vidéos DURÉES",
+      "chapterId": "chapitre-6-volumes"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tchapterId\nch6-durees-videos\tVidéos DURÉES\tchapitre-6-volumes\n",
+  "stderr": "",
+  "execution_time_ms": 46
+}

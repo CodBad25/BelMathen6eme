@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, title, chapterId FROM resources WHERE title LIKE '%immobilier%' OR title LIKE '%cochon%' OR title LIKE '%trottinette%' OR title LIKE '%fruits%' OR title LIKE '%Impôt%' OR title LIKE '%DVD%' OR title LIKE '%Anamorphose%' OR title LIKE '%Carte mentale%' OR title LIKE '%Durées%' OR title LIKE '%DURÉES%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 45WcYVoGoV7qkUB.root --database N8nfeXx5Eou9K4bQZyT4Qp --execute SELECT id, title, chapterId FROM resources WHERE title LIKE '%immobilier%' OR title LIKE '%cochon%' OR title LIKE '%trottinette%' OR title LIKE '%fruits%' OR title LIKE '%Impôt%' OR title LIKE '%DVD%' OR title LIKE '%Anamorphose%' OR title LIKE '%Carte mentale%' OR title LIKE '%Durées%' OR title LIKE '%DURÉES%'",
+  "rows": [
+    {
+      "id": "ch1-sit-1",
+      "title": "Situation n°1 - Prix immobilier à Lyon",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch1-sit-2",
+      "title": "Situation n°2 - Côte de cochon",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch1-sit-3",
+      "title": "Situation n°3 - Location trottinette",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch1-sit-4",
+      "title": "Situation n°4 - Évolution Prix fruits et légumes",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch1-sit-5",
+      "title": "Situation n°5 - Impôt sur le revenu",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch1-sit-6",
+      "title": "Situation n°6 - Location de DVD",
+      "chapterId": "chapitre-1"
+    },
+    {
+      "id": "ch3bis-anamorphose",
+      "title": "Anamorphose Fractions",
+      "chapterId": "chapitre-3bis"
+    },
+    {
+      "id": "ch3bis-carte-mentale",
+      "title": "Carte mentale sur les fractions",
+      "chapterId": "chapitre-3bis"
+    },
+    {
+      "id": "ch6-durees-videos",
+      "title": "Vidéos DURÉES",
+      "chapterId": "chapitre-6-volumes"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tchapterId\nch1-sit-1\tSituation n°1 - Prix immobilier à Lyon\tchapitre-1\nch1-sit-2\tSituation n°2 - Côte de cochon\tchapitre-1\nch1-sit-3\tSituation n°3 - Location trottinette\tchapitre-1\nch1-sit-4\tSituation n°4 - Évolution Prix fruits et légumes\tchapitre-1\nch1-sit-5\tSituation n°5 - Impôt sur le revenu\tchapitre-1\nch1-sit-6\tSituation n°6 - Location de DVD\tchapitre-1\nch3bis-anamorphose\tAnamorphose Fractions\tchapitre-3bis\nch3bis-carte-mentale\tCarte mentale sur les fractions\tchapitre-3bis\nch6-durees-videos\tVidéos DURÉES\tchapitre-6-volumes\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

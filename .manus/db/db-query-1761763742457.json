@@ -1,0 +1,262 @@
+{
+  "query": "SELECT id, title, type, sectionId FROM resources LIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 45WcYVoGoV7qkUB.root --database N8nfeXx5Eou9K4bQZyT4Qp --execute SELECT id, title, type, sectionId FROM resources LIMIT 50",
+  "rows": [
+    {
+      "id": "ch1-aide-1",
+      "title": "Aide technique n°1 - Moyenne, médiane, étendue",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch1-aide-2",
+      "title": "Aide technique n°2 - Proportionnalité, Pourcentages",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch1-cours",
+      "title": "Les Prix - Cours 4e",
+      "type": "pdf",
+      "sectionId": "cours"
+    },
+    {
+      "id": "ch1-exercices",
+      "title": "Feuille d'exercices Les Prix 4e",
+      "type": "pdf",
+      "sectionId": "exercices"
+    },
+    {
+      "id": "ch1-feuille-route",
+      "title": "Feuille de route - PRIX 4e",
+      "type": "pdf",
+      "sectionId": "feuille-route"
+    },
+    {
+      "id": "ch1-fiche-1",
+      "title": "Fiche technique n°1 - Moyenne, médiane, étendue",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch1-fiche-2",
+      "title": "Fiche technique n°2 - Proportionnalité, Pourcentages",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch1-fiche-3",
+      "title": "Fiche technique n°3 - Calcul littéral 1ère Partie",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch1-sit-1",
+      "title": "Situation n°1 - Prix immobilier à Lyon",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-2",
+      "title": "Situation n°2 - Côte de cochon",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-3",
+      "title": "Situation n°3 - Location trottinette",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-4",
+      "title": "Situation n°4 - Évolution Prix fruits et légumes",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-5",
+      "title": "Situation n°5 - Impôt sur le revenu",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-6",
+      "title": "Situation n°6 - Location de DVD",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch1-sit-7",
+      "title": "Situation n°7 - Mise en place calcul littéral et résolution d'équations",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch2-aide-1",
+      "title": "Aide technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch2-cours",
+      "title": "Les Longueurs - Cours",
+      "type": "pdf",
+      "sectionId": "cours"
+    },
+    {
+      "id": "ch2-fiche-1",
+      "title": "Fiche technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch2-situations",
+      "title": "Situations et activités",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch2-video-1",
+      "title": "Vidéo du chapitre n°2",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch3-aide-1",
+      "title": "Aide technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch3-exercices",
+      "title": "Feuille d'exercices + rituels",
+      "type": "pdf",
+      "sectionId": "exercices"
+    },
+    {
+      "id": "ch3-fiche-1",
+      "title": "Fiche technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch3-situations",
+      "title": "Situations et activité",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch3-video-1",
+      "title": "Vidéos du chapitre n°3",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch3bis-anamorphose",
+      "title": "Anamorphose Fractions",
+      "type": "pdf",
+      "sectionId": "ressources"
+    },
+    {
+      "id": "ch3bis-carte-mentale",
+      "title": "Carte mentale sur les fractions",
+      "type": "pdf",
+      "sectionId": "ressources"
+    },
+    {
+      "id": "ch3bis-videos",
+      "title": "Vidéos Fractions",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch4-cours",
+      "title": "Cours",
+      "type": "pdf",
+      "sectionId": "cours"
+    },
+    {
+      "id": "ch4-videos",
+      "title": "Vidéos CHANCES",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch5-aides",
+      "title": "Aides techniques",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch5-cours",
+      "title": "Cours",
+      "type": "pdf",
+      "sectionId": "cours"
+    },
+    {
+      "id": "ch5-fiches",
+      "title": "Fiches techniques",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch5-situations",
+      "title": "Situations + Activités",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch5-videos",
+      "title": "Vidéos AIRES",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch6-angles-videos",
+      "title": "Vidéos ANGLES",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch6-durees-videos",
+      "title": "Vidéos DURÉES",
+      "type": "video",
+      "sectionId": "videos"
+    },
+    {
+      "id": "ch6-volumes-aide",
+      "title": "Aide technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch6-volumes-cours",
+      "title": "Cours",
+      "type": "pdf",
+      "sectionId": "cours"
+    },
+    {
+      "id": "ch6-volumes-fiche",
+      "title": "Fiche technique",
+      "type": "pdf",
+      "sectionId": "fiches-techniques"
+    },
+    {
+      "id": "ch6-volumes-situations",
+      "title": "Situations / Activités",
+      "type": "pdf",
+      "sectionId": "activites"
+    },
+    {
+      "id": "ch6-volumes-videos",
+      "title": "Vidéos VOLUMES",
+      "type": "video",
+      "sectionId": "videos"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\ttype\tsectionId\nch1-aide-1\tAide technique n°1 - Moyenne, médiane, étendue\tpdf\tfiches-techniques\nch1-aide-2\tAide technique n°2 - Proportionnalité, Pourcentages\tpdf\tfiches-techniques\nch1-cours\tLes Prix - Cours 4e\tpdf\tcours\nch1-exercices\tFeuille d'exercices Les Prix 4e\tpdf\texercices\nch1-feuille-route\tFeuille de route - PRIX 4e\tpdf\tfeuille-route\nch1-fiche-1\tFiche technique n°1 - Moyenne, médiane, étendue\tpdf\tfiches-techniques\nch1-fiche-2\tFiche technique n°2 - Proportionnalité, Pourcentages\tpdf\tfiches-techniques\nch1-fiche-3\tFiche technique n°3 - Calcul littéral 1ère Partie\tpdf\tfiches-techniques\nch1-sit-1\tSituation n°1 - Prix immobilier à Lyon\tpdf\tactivites\nch1-sit-2\tSituation n°2 - Côte de cochon\tpdf\tactivites\nch1-sit-3\tSituation n°3 - Location trottinette\tpdf\tactivites\nch1-sit-4\tSituation n°4 - Évolution Prix fruits et légumes\tpdf\tactivites\nch1-sit-5\tSituation n°5 - Impôt sur le revenu\tpdf\tactivites\nch1-sit-6\tSituation n°6 - Location de DVD\tpdf\tactivites\nch1-sit-7\tSituation n°7 - Mise en place calcul littéral et résolution d'équations\tpdf\tactivites\nch2-aide-1\tAide technique\tpdf\tfiches-techniques\nch2-cours\tLes Longueurs - Cours\tpdf\tcours\nch2-fiche-1\tFiche technique\tpdf\tfiches-techniques\nch2-situations\tSituations et activités\tpdf\tactivites\nch2-video-1\tVidéo du chapitre n°2\tvideo\tvideos\nch3-aide-1\tAide technique\tpdf\tfiches-techniques\nch3-exercices\tFeuille d'exercices + rituels\tpdf\texercices\nch3-fiche-1\tFiche technique\tpdf\tfiches-techniques\nch3-situations\tSituations et activité\tpdf\tactivites\nch3-video-1\tVidéos du chapitre n°3\tvideo\tvideos\nch3bis-anamorphose\tAnamorphose Fractions\tpdf\tressources\nch3bis-carte-mentale\tCarte mentale sur les fractions\tpdf\tressources\nch3bis-videos\tVidéos Fractions\tvideo\tvideos\nch4-cours\tCours\tpdf\tcours\nch4-videos\tVidéos CHANCES\tvideo\tvideos\nch5-aides\tAides techniques\tpdf\tfiches-techniques\nch5-cours\tCours\tpdf\tcours\nch5-fiches\tFiches techniques\tpdf\tfiches-techniques\nch5-situations\tSituations + Activités\tpdf\tactivites\nch5-videos\tVidéos AIRES\tvideo\tvideos\nch6-angles-videos\tVidéos ANGLES\tvideo\tvideos\nch6-durees-videos\tVidéos DURÉES\tvideo\tvideos\nch6-volumes-aide\tAide technique\tpdf\tfiches-techniques\nch6-volumes-cours\tCours\tpdf\tcours\nch6-volumes-fiche\tFiche technique\tpdf\tfiches-techniques\nch6-volumes-situations\tSituations / Activités\tpdf\tactivites\nch6-volumes-videos\tVidéos VOLUMES\tvideo\tvideos\n",
+  "stderr": "",
+  "execution_time_ms": 871
+}

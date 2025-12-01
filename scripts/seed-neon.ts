@@ -1,0 +1,223 @@
+import { neon } from "@neondatabase/serverless";
+import "dotenv/config";
+
+const resources = [
+  // Chapitre 1 - Feuille de route
+  {
+    id: "ch1-feuille-route",
+    chapterId: "chapitre-1",
+    sectionId: "feuille-route",
+    title: "Feuille de route - PRIX 4e",
+    description: "Document de présentation du chapitre",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/KJtjuLcUNEfBENoP.pdf",
+    icon: "📄",
+    visible: "true",
+    order: 1,
+    displayOrder: 0,
+  },
+  // Chapitre 1 - Cours
+  {
+    id: "ch1-cours",
+    chapterId: "chapitre-1",
+    sectionId: "cours",
+    title: "Les Prix - Cours 4e",
+    description: "Cours complet",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/RpDZlkYwqohZjCcn.pdf",
+    icon: "📘",
+    visible: "true",
+    order: 1,
+    displayOrder: 0,
+  },
+  // Chapitre 1 - Fiches techniques
+  {
+    id: "ch1-fiche-1",
+    chapterId: "chapitre-1",
+    sectionId: "fiches-techniques",
+    title: "Fiche technique n°1",
+    description: "Moyenne, médiane, étendue",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/mTGkFGTOIDClJSuY.pdf",
+    icon: "📊",
+    visible: "true",
+    order: 1,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-aide-1",
+    chapterId: "chapitre-1",
+    sectionId: "fiches-techniques",
+    title: "Aide technique n°1",
+    description: "Moyenne, médiane, étendue",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/oWOTjjYFDTjObvwz.pdf",
+    icon: "💡",
+    visible: "true",
+    order: 2,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-fiche-2",
+    chapterId: "chapitre-1",
+    sectionId: "fiches-techniques",
+    title: "Fiche technique n°2",
+    description: "Proportionnalité, Pourcentages",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/pTflhnTvPlKOMOYR.pdf",
+    icon: "📊",
+    visible: "true",
+    order: 3,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-aide-2",
+    chapterId: "chapitre-1",
+    sectionId: "fiches-techniques",
+    title: "Aide technique n°2",
+    description: "Proportionnalité, Pourcentages",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/ZpAuWrxQyOZlSxgX.pdf",
+    icon: "💡",
+    visible: "true",
+    order: 4,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-fiche-3",
+    chapterId: "chapitre-1",
+    sectionId: "fiches-techniques",
+    title: "Fiche technique n°3",
+    description: "Calcul littéral 1ère Partie",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/KcvbtAQzhejyYyNU.pdf",
+    icon: "📊",
+    visible: "true",
+    order: 5,
+    displayOrder: 0,
+  },
+  // Chapitre 1 - Exercices et situations
+  {
+    id: "ch1-exercices",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Feuille d'exercices Les Prix 4e",
+    description: "Exercices d'application",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/oCfZJgjcDSfSPcRN.pdf",
+    icon: "📝",
+    visible: "true",
+    order: 1,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-1",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°1",
+    description: "Prix immobilier à Lyon",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/yrKxChbZpUZoWOrX.pdf",
+    icon: "🏘️",
+    visible: "true",
+    order: 2,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-2",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°2",
+    description: "Côte de cochon",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/tzziOrQiXnlxogAn.pdf",
+    icon: "🥩",
+    visible: "true",
+    order: 3,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-3",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°3",
+    description: "Location trottinette",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/SZbbFOJcgtSQnDbd.pdf",
+    icon: "🛴",
+    visible: "true",
+    order: 4,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-4",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°4",
+    description: "Evolution Prix fruits et légumes",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/QVVXWLwiOmjcdtJj.pdf",
+    icon: "🍎",
+    visible: "true",
+    order: 5,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-5",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°5",
+    description: "Impôts sur le revenu",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/NbknLxVnCoYIWBtm.pdf",
+    icon: "💰",
+    visible: "true",
+    order: 6,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-6",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°6",
+    description: "Location de DVD",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/ZJwtcYJXMXIttIzt.pdf",
+    icon: "📀",
+    visible: "true",
+    order: 7,
+    displayOrder: 0,
+  },
+  {
+    id: "ch1-situation-7",
+    chapterId: "chapitre-1",
+    sectionId: "exercices",
+    title: "Situation n°7",
+    description: "Mise en place calcul littéral et résolution d'équations",
+    type: "pdf",
+    url: "https://files.manuscdn.com/user_upload_by_module/session_file/109950314/kpiFqzWPTyNXoMJA.pdf",
+    icon: "🔢",
+    visible: "true",
+    order: 8,
+    displayOrder: 0,
+  },
+];
+
+async function seed() {
+  const sql = neon(process.env.DATABASE_URL!);
+
+  console.log("Seeding database with resources...");
+
+  for (const resource of resources) {
+    await sql`
+      INSERT INTO resources (id, "chapterId", "sectionId", title, description, type, url, icon, visible, "order", "displayOrder")
+      VALUES (${resource.id}, ${resource.chapterId}, ${resource.sectionId}, ${resource.title}, ${resource.description}, ${resource.type}, ${resource.url}, ${resource.icon}, ${resource.visible}, ${resource.order}, ${resource.displayOrder})
+      ON CONFLICT (id) DO NOTHING
+    `;
+    console.log(`  + ${resource.title}`);
+  }
+
+  console.log(`\n✓ ${resources.length} resources seeded`);
+}
+
+seed().catch(console.error);

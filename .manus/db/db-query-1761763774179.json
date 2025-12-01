@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE resources SET icon = '🔧' WHERE title LIKE '%Fiche technique%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 45WcYVoGoV7qkUB.root --database N8nfeXx5Eou9K4bQZyT4Qp --execute UPDATE resources SET icon = '🔧' WHERE title LIKE '%Fiche technique%'",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 55
+}
