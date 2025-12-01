@@ -160,11 +160,29 @@ export default function AdminGestion() {
     );
   }
 
+  // Grouper par chapitre et trier par section puis par ordre (pas par visibilité!)
   const groupedResources = resources?.reduce((acc, r) => {
     if (!acc[r.chapterId]) acc[r.chapterId] = [];
     acc[r.chapterId].push(r);
     return acc;
   }, {} as Record<string, typeof resources>);
+
+  // Trier les ressources dans chaque chapitre par section puis par ordre
+  if (groupedResources) {
+    const sectionOrder = ["introduction", "etude-1", "etude-2", "etude-3", "etude-4", "activite-rapide", "corrections"];
+    Object.keys(groupedResources).forEach(chapterId => {
+      groupedResources[chapterId]?.sort((a, b) => {
+        // D'abord par section
+        const sectionIndexA = sectionOrder.indexOf(a.sectionId);
+        const sectionIndexB = sectionOrder.indexOf(b.sectionId);
+        if (sectionIndexA !== sectionIndexB) {
+          return (sectionIndexA === -1 ? 999 : sectionIndexA) - (sectionIndexB === -1 ? 999 : sectionIndexB);
+        }
+        // Puis par ordre dans la section
+        return a.order - b.order;
+      });
+    });
+  }
 
   const visibleCount = resources?.filter((r) => r.visible === "true").length || 0;
 
@@ -412,7 +430,14 @@ export default function AdminGestion() {
                 <CardContent>
                   <div className="space-y-2">
                     {chapterResources.map((resource) => (
-                      <div key={resource.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                      <div
+                        key={resource.id}
+                        className={`flex items-center justify-between p-3 rounded border-l-4 ${
+                          resource.visible === "true"
+                            ? "bg-gray-50 border-l-green-500"
+                            : "bg-gray-100 border-l-gray-300 opacity-60"
+                        }`}
+                      >
                         {selectMode && (
                           <input
                             type="checkbox"
