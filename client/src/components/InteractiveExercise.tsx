@@ -593,18 +593,23 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
             {/* Chèque */}
             {currentQuestion.type === "cheque" && currentQuestion.chequeData && (
               <div className="space-y-[3vw] md:space-y-4">
+                {/* Rappel du contexte sans donner la réponse */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-[3vw] md:p-3">
+                  <p className="text-[3vw] md:text-sm text-amber-800">
+                    <strong>📝 {currentQuestion.chequeData.station}</strong> - Remplis le chèque pour <strong>100 L</strong> de gazole.
+                  </p>
+                  <p className="text-[2.5vw] md:text-xs text-amber-600 mt-1">
+                    💡 Tu peux consulter tes réponses précédentes si besoin !
+                  </p>
+                </div>
+
                 {/* Image du chèque */}
-                <div className="relative border-2 border-gray-300 rounded-xl overflow-hidden bg-white">
+                <div className="border-2 border-gray-300 rounded-xl overflow-hidden bg-white">
                   <img
                     src="/exercices/prix/cheque_francais.png"
                     alt="Chèque"
-                    className="w-full opacity-30"
+                    className="w-full"
                   />
-                  <div className="absolute inset-0 p-[3vw] md:p-4 flex flex-col justify-center">
-                    <p className="text-[3vw] md:text-sm font-medium text-gray-700 mb-[2vw] md:mb-2">
-                      📝 {currentQuestion.chequeData.station} - {currentQuestion.chequeData.montant.toFixed(2)} €
-                    </p>
-                  </div>
                 </div>
 
                 {/* Champs à remplir */}
