@@ -578,7 +578,7 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
     const allSelected = selectedSectionIds.length === sections.length;
 
     return (
-      <div className="fixed inset-0 bg-black/70 z-50 overflow-y-auto p-[3vw] md:p-4">
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 to-indigo-900 z-50 overflow-y-auto p-[3vw] md:p-4">
         <Card className="max-w-2xl mx-auto my-[2vh] md:my-4">
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-[4vw] md:p-6 text-center">
             <Gamepad2 className="w-[12vw] h-[12vw] md:w-12 md:h-12 mx-auto mb-[2vw] md:mb-3" />
@@ -725,7 +725,7 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
       : selectedSections.map(s => s.label).join(" + ");
 
     return (
-      <div className="fixed inset-0 bg-black/70 z-50 overflow-y-auto p-[2vw] md:p-4">
+      <div className="fixed inset-0 bg-gradient-to-br from-green-800 to-emerald-900 z-50 overflow-y-auto p-[2vw] md:p-4">
         <Card className="max-w-lg mx-auto my-[5vh] md:my-10">
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-[4vw] md:p-4 text-center">
             <div className="flex justify-center gap-[1vw] md:gap-1 mb-[1vw] md:mb-2">
@@ -778,7 +778,7 @@ export default function InteractiveExercise({ onClose }: InteractiveExerciseProp
     : selectedSections.map(s => s.label).join(" + ");
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-800 to-slate-900 z-50 overflow-y-auto">
       {/* Header fixe */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg">
         <div className="max-w-2xl mx-auto p-[3vw] md:p-4">
