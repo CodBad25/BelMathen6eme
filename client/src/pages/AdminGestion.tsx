@@ -452,28 +452,40 @@ export default function AdminGestion() {
                                 }
                               />
                             </div>
-                            {/* Visibilité par classe - seulement les classes actives */}
+                            {/* Visibilité par classe - seulement si visible ET si classes actives */}
                             {activeClasses.length > 0 && (
-                              <div className="flex items-center gap-1 border-l pl-2">
+                              <div className={`flex items-center gap-1 border-l pl-2 ${resource.visible !== "true" ? "opacity-30" : ""}`}>
                                 {(["6A", "6B", "6C", "6D"] as const)
                                   .filter(classe => activeClasses.includes(classe))
                                   .map((classe) => {
                                     const field = `visible${classe}` as keyof typeof resource;
                                     const isVisible = resource[field] === "true";
+                                    const isDisabled = resource.visible !== "true";
                                     return (
                                       <button
                                         key={classe}
-                                        onClick={() => toggleClassVisibility.mutate({
-                                          id: resource.id,
-                                          classe,
-                                          visible: isVisible ? "false" : "true"
-                                        })}
+                                        onClick={() => {
+                                          if (isDisabled) {
+                                            toast.error("Activez d'abord la visibilité générale (Vis)");
+                                            return;
+                                          }
+                                          toggleClassVisibility.mutate({
+                                            id: resource.id,
+                                            classe,
+                                            visible: isVisible ? "false" : "true"
+                                          });
+                                        }}
+                                        disabled={isDisabled}
                                         className={`px-1.5 py-0.5 rounded text-xs font-medium transition-colors ${
-                                          isVisible
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200 text-gray-500"
+                                          isDisabled
+                                            ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                                            : isVisible
+                                              ? "bg-blue-500 text-white hover:bg-blue-600"
+                                              : "bg-gray-200 text-gray-500 hover:bg-gray-300"
                                         }`}
-                                        title={`${classe}: ${isVisible ? "visible" : "masqué"}`}
+                                        title={isDisabled
+                                          ? "Activez d'abord Vis"
+                                          : `${classe}: ${isVisible ? "visible" : "masqué"}`}
                                       >
                                         {classe.replace("6", "")}
                                       </button>
