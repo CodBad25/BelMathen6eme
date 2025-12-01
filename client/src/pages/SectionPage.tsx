@@ -18,6 +18,7 @@ const grandeurs: Record<string, { name: string; icon: string; color: string }> =
 const sectionsByChapter: Record<string, Record<string, { name: string; icon: string; color: string }>> = {
   "chapitre-1-angles": {
     "introduction": { name: "Introduction", icon: "🎯", color: "from-slate-500 to-gray-600" },
+    "cours": { name: "Cours", icon: "📚", color: "from-rose-500 to-pink-600" },
     "etude-1": { name: "Étude n°1 - Comparer des angles", icon: "📖", color: "from-blue-500 to-indigo-600" },
     "etude-2": { name: "Étude n°2 - Multiplier et diviser des angles", icon: "📖", color: "from-green-500 to-emerald-600" },
     "etude-3": { name: "Étude n°3 - Mesurer des angles", icon: "📖", color: "from-purple-500 to-violet-600" },
@@ -25,6 +26,7 @@ const sectionsByChapter: Record<string, Record<string, { name: string; icon: str
   },
   "chapitre-2-prix": {
     "introduction": { name: "Introduction", icon: "🎯", color: "from-slate-500 to-gray-600" },
+    "cours": { name: "Cours", icon: "📚", color: "from-rose-500 to-pink-600" },
     "etude-1": { name: "Étude n°1 - Comparer des prix", icon: "📖", color: "from-blue-500 to-indigo-600" },
     "etude-2": { name: "Étude n°2 - Calculer des prix", icon: "📖", color: "from-green-500 to-emerald-600" },
     "etude-3": { name: "Étude n°3 - Partager des prix", icon: "📖", color: "from-purple-500 to-violet-600" },
@@ -32,6 +34,7 @@ const sectionsByChapter: Record<string, Record<string, { name: string; icon: str
   },
   "chapitre-3-aires": {
     "introduction": { name: "Introduction", icon: "🎯", color: "from-slate-500 to-gray-600" },
+    "cours": { name: "Cours", icon: "📚", color: "from-rose-500 to-pink-600" },
     "etude-1": { name: "Étude n°1 - Comparer des aires", icon: "📖", color: "from-blue-500 to-indigo-600" },
     "etude-2": { name: "Étude n°2 - Mesurer une aire", icon: "📖", color: "from-green-500 to-emerald-600" },
     "etude-3": { name: "Étude n°3 - Calculer une aire", icon: "📖", color: "from-purple-500 to-violet-600" },
@@ -39,6 +42,7 @@ const sectionsByChapter: Record<string, Record<string, { name: string; icon: str
   },
   "chapitre-4-durees": {
     "introduction": { name: "Introduction", icon: "🎯", color: "from-slate-500 to-gray-600" },
+    "cours": { name: "Cours", icon: "📚", color: "from-rose-500 to-pink-600" },
     "etude-1": { name: "Étude n°1 - Comparer, additionner, soustraire des durées", icon: "📖", color: "from-blue-500 to-indigo-600" },
     "etude-2": { name: "Étude n°2 - Multiplier et diviser des durées", icon: "📖", color: "from-green-500 to-emerald-600" },
     "etude-3": { name: "Étude n°3 - Calculer des horaires, des dates ou des durées", icon: "📖", color: "from-purple-500 to-violet-600" },
@@ -46,6 +50,7 @@ const sectionsByChapter: Record<string, Record<string, { name: string; icon: str
   },
   "chapitre-5-volumes": {
     "introduction": { name: "Introduction", icon: "🎯", color: "from-slate-500 to-gray-600" },
+    "cours": { name: "Cours", icon: "📚", color: "from-rose-500 to-pink-600" },
     "etude-1": { name: "Étude n°1 - Comparer des volumes", icon: "📖", color: "from-blue-500 to-indigo-600" },
     "etude-2": { name: "Étude n°2 - Rapport entre les volumes", icon: "📖", color: "from-green-500 to-emerald-600" },
     "etude-3": { name: "Étude n°3 - Mesurer un volume", icon: "📖", color: "from-purple-500 to-violet-600" },

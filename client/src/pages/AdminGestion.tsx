@@ -169,7 +169,7 @@ export default function AdminGestion() {
 
   // Trier les ressources dans chaque chapitre par section puis par ordre
   if (groupedResources) {
-    const sectionOrder = ["introduction", "etude-1", "etude-2", "etude-3", "etude-4", "activite-rapide", "corrections"];
+    const sectionOrder = ["introduction", "cours", "etude-1", "etude-2", "etude-3", "etude-4", "activite-rapide", "corrections"];
     Object.keys(groupedResources).forEach(chapterId => {
       groupedResources[chapterId]?.sort((a, b) => {
         // D'abord par section
@@ -198,6 +198,7 @@ export default function AdminGestion() {
   const sectionsByChapter: Record<string, Array<{ id: string; label: string }>> = {
     "chapitre-1-angles": [
       { id: "introduction", label: "🎯 Introduction" },
+      { id: "cours", label: "📚 Cours" },
       { id: "etude-1", label: "📖 Étude n°1 - Comparer des angles" },
       { id: "etude-2", label: "📖 Étude n°2 - Multiplier et diviser des angles" },
       { id: "etude-3", label: "📖 Étude n°3 - Mesurer des angles" },
@@ -205,6 +206,7 @@ export default function AdminGestion() {
     ],
     "chapitre-2-prix": [
       { id: "introduction", label: "🎯 Introduction" },
+      { id: "cours", label: "📚 Cours" },
       { id: "etude-1", label: "📖 Étude n°1 - Comparer des prix" },
       { id: "etude-2", label: "📖 Étude n°2 - Calculer des prix" },
       { id: "etude-3", label: "📖 Étude n°3 - Partager des prix" },
@@ -212,6 +214,7 @@ export default function AdminGestion() {
     ],
     "chapitre-3-aires": [
       { id: "introduction", label: "🎯 Introduction" },
+      { id: "cours", label: "📚 Cours" },
       { id: "etude-1", label: "📖 Étude n°1 - Comparer des aires" },
       { id: "etude-2", label: "📖 Étude n°2 - Mesurer une aire" },
       { id: "etude-3", label: "📖 Étude n°3 - Calculer une aire" },
@@ -219,6 +222,7 @@ export default function AdminGestion() {
     ],
     "chapitre-4-durees": [
       { id: "introduction", label: "🎯 Introduction" },
+      { id: "cours", label: "📚 Cours" },
       { id: "etude-1", label: "📖 Étude n°1 - Comparer, additionner, soustraire des durées" },
       { id: "etude-2", label: "📖 Étude n°2 - Multiplier et diviser des durées" },
       { id: "etude-3", label: "📖 Étude n°3 - Calculer des horaires, des dates ou des durées" },
@@ -226,6 +230,7 @@ export default function AdminGestion() {
     ],
     "chapitre-5-volumes": [
       { id: "introduction", label: "🎯 Introduction" },
+      { id: "cours", label: "📚 Cours" },
       { id: "etude-1", label: "📖 Étude n°1 - Comparer des volumes" },
       { id: "etude-2", label: "📖 Étude n°2 - Rapport entre les volumes" },
       { id: "etude-3", label: "📖 Étude n°3 - Mesurer un volume" },
