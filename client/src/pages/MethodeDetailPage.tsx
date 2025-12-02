@@ -1,7 +1,7 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
 
 // Contenu simplifié des méthodes - chaque "étape" est une slide
@@ -287,12 +287,15 @@ export default function MethodeDetailPage() {
       <header className={`bg-gradient-to-r ${methode.color} text-white py-[2vh] md:py-4 px-4 shadow-lg`}>
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-[2vw] md:gap-3">
-            <Link href={`/grandeur/${chapterId}/methodes`}>
-              <Button variant="secondary" size="sm" className="flex-shrink-0 h-[8vw] w-[8vw] md:h-auto md:w-auto p-0 md:px-3">
-                <ArrowLeft className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
-                <span className="hidden md:inline md:ml-1">Retour</span>
-              </Button>
-            </Link>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-shrink-0 h-[8vw] md:h-auto p-0 px-2 md:px-3"
+              onClick={() => window.history.back()}
+            >
+              <RotateCcw className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
+              <span className="ml-1 text-[3vw] md:text-sm">Retour</span>
+            </Button>
             <div className="flex items-center gap-[2vw]">
               <span className="text-[8vw] md:text-4xl">{methode.icon}</span>
               <div>

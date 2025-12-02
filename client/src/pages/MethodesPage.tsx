@@ -1,7 +1,7 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 // Données des méthodes par chapitre - version courte pour la liste
 const methodesByChapter: Record<string, { id: string; title: string; shortTitle: string; icon: string; description: string }[]> = {
@@ -56,12 +56,15 @@ export default function MethodesPage() {
         <div className="max-w-4xl mx-auto">
           <p className="text-[2vw] md:text-sm opacity-75 text-center">Réalisé avec ❤️ par M.BELHAJ</p>
           <div className="flex items-center gap-[2vw] md:gap-3">
-            <Link href={`/grandeur/${chapterId}`}>
-              <Button variant="secondary" size="sm" className="flex-shrink-0 h-[8vw] w-[8vw] md:h-auto md:w-auto p-0 md:px-3">
-                <ArrowLeft className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
-                <span className="hidden md:inline md:ml-1">Retour</span>
-              </Button>
-            </Link>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-shrink-0 h-[8vw] md:h-auto p-0 px-2 md:px-3"
+              onClick={() => window.history.back()}
+            >
+              <RotateCcw className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
+              <span className="ml-1 text-[3vw] md:text-sm">Retour</span>
+            </Button>
             <div className="flex items-center gap-[2vw]">
               <span className="text-[8vw] md:text-4xl">📚</span>
               <div>
