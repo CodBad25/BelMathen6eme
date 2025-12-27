@@ -70,6 +70,12 @@ let minAngleZ2, maxAngleZ2;   // Étendue zone supérieure (plus courte)
 // INITIALISATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Sur mobile, ajuster le viewBox pour montrer la construction
+    if (isMobile) {
+        const svgEl = document.getElementById('canvas');
+        svgEl.setAttribute('viewBox', '0 200 750 500');
+    }
+
     initConfig();
     buildSteps();
     initModeAnimation();
