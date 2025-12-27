@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sur mobile, ajuster le viewBox pour montrer la construction
     if (isMobile) {
         const svgEl = document.getElementById('canvas');
-        svgEl.setAttribute('viewBox', '0 200 750 500');
+        svgEl.setAttribute('viewBox', '0 350 750 450');
     }
 
     initConfig();
