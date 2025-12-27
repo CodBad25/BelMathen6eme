@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirale d'Archimède v2 - Interactive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #eee;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .version-badge {
+            background: #9b59b6;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            margin-left: 10px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .canvas-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        #canvas {
+            display: block;
+            cursor: default;
+        }
+        .controls {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 320px;
+            max-width: 360px;
+        }
+        .mode-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 4px;
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: #888;
+        }
+        .mode-tab:hover {
+            color: #ccc;
+        }
+        .mode-tab.active {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+        }
+        .mode-panel {
+            display: none;
+        }
+        .mode-panel.active {
+            display: block;
+        }
+        .control-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        .control-group label {
+            color: #ccc;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .control-value {
+            color: #9b59b6;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .info-box {
+            background: rgba(155, 89, 182, 0.2);
+            border-left: 4px solid #9b59b6;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+        .info-box h4 {
+            color: #9b59b6;
+            margin-bottom: 8px;
+        }
+        .info-box p {
+            color: #ddd;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+        .drag-hint {
+            color: #f39c12;
+            font-size: 0.8em;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-label {
+            color: #888;
+            font-size: 0.75em;
+            display: block;
+        }
+        .stat-value {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spirale d'Archimède <span class="version-badge">v2 Interactive</span></h1>
+    <p class="subtitle">Personnalise ta spirale en bougeant le point B et en ajustant la longueur OA</p>
+
+    <div class="container">
+        <div class="canvas-container">
+            <svg id="canvas" width="600" height="550"></svg>
+        </div>
+
+        <div class="controls">
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="tabPersonnalisation">Personnalisation</button>
+                <button class="mode-tab" id="tabAnimation">Animation</button>
+            </div>
+
+            <div class="mode-panel active" id="panelPersonnalisation">
+                <div class="control-group">
+                    <label>Longueur OA : <span class="control-value" id="oaValue">18</span></label>
+                    <input type="range" id="oaSlider" min="10" max="35" value="18">
+                </div>
+
+                <div class="drag-hint">
+                    Glisse le point <strong style="color: #3498db;">B</strong> sur l'arc pour changer l'angle !
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Branches</span>
+                        <span class="stat-value" id="statBranches">16</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Points</span>
+                        <span class="stat-value" id="statPoints">16</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" id="btnReset" style="margin-top: 20px;">Réinitialiser</button>
+
+                <div class="info-box">
+                    <h4>Comment ça marche ?</h4>
+                    <p>
+                        <strong>Point B</strong> : Glisse-le sur l'arc bleu pour changer l'angle entre les rayons.<br><br>
+                        <strong>Longueur OA</strong> : Ajuste la taille de l'unité de base.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mode-panel" id="panelAnimation">
+                <button class="btn btn-primary" id="btnPlay">Lancer l'animation</button>
+                <button class="btn btn-secondary" id="btnPause">Pause</button>
+
+                <div class="control-group">
+                    <label>Vitesse : <span id="speedValue">1x</span></label>
+                    <input type="range" id="speedSlider" min="0.5" max="3" step="0.5" value="1">
+                </div>
+
+                <div class="info-box">
+                    <h4>Mode Animation</h4>
+                    <p>
+                        Regarde la construction pas à pas avec la règle et le compas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="geometrie.js"></script>
+    <script src="spirale-v2.js"></script>
+</body>
+</html>
