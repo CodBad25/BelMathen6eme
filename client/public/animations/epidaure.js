@@ -53,11 +53,12 @@ let steps = [];
 let currentStep = 0;
 let isAnimating = false;
 
-// Zoom
+// Zoom - valeurs différentes pour mobile
+const isMobile = window.innerWidth <= 768;
 let zoomGroup = null;
-let currentZoom = 1.3;
-const ZOOM_START = 1.3;
-const ZOOM_END = 0.75;
+let currentZoom = isMobile ? 0.7 : 1.3;
+const ZOOM_START = isMobile ? 0.7 : 1.3;
+const ZOOM_END = isMobile ? 0.5 : 0.75;
 let autoZoomEnabled = true;
 
 // Données calculées
