@@ -49,7 +49,7 @@ const exercicesByEtude: Record<string, Record<string, Exercice[]>> = {
         image: "/animations/spirale.png",
         animationUrl: "/animations/spirale.html",
         enonceUrl: "/animations/spirale-enonce.pdf",
-        travauxUrl: "",
+        travauxUrl: "https://digipad.app/p/1505393/96f399726386b",
       },
       {
         type: "animation",
