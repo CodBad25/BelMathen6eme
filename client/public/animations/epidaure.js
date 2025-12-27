@@ -194,7 +194,8 @@ function applyZoom(scale, updateSlider = true) {
 
     const cx = svgWidth / 2;
     // Centrer sur un point PLUS HAUT que O pour que O apparaisse en bas
-    const cy = svgHeight / 2 + 100;
+    // Sur mobile, remonter davantage pour voir toute la construction
+    const cy = isMobile ? svgHeight / 2 - 50 : svgHeight / 2 + 100;
 
     const translateX = cx - O.x * scale;
     const translateY = cy - O.y * scale;
