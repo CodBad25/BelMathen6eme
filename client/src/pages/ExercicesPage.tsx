@@ -40,7 +40,7 @@ const exercicesByEtude: Record<string, Record<string, Exercice[]>> = {
         image: "/animations/eventail.png",
         animationUrl: "/animations/eventail.html",
         enonceUrl: "/animations/eventail-enonce.pdf",
-        travauxUrl: "", // À remplir avec le lien La Digitale
+        travauxUrl: "https://digipad.app/p/1454993/bd1a1cfd9f64d",
       },
       {
         type: "animation",
@@ -49,7 +49,7 @@ const exercicesByEtude: Record<string, Record<string, Exercice[]>> = {
         image: "/animations/spirale.png",
         animationUrl: "/animations/spirale.html",
         enonceUrl: "/animations/spirale-enonce.pdf",
-        travauxUrl: "", // À remplir avec le lien La Digitale
+        travauxUrl: "",
       },
       {
         type: "animation",
@@ -58,7 +58,7 @@ const exercicesByEtude: Record<string, Record<string, Exercice[]>> = {
         image: "/animations/epidaure.png",
         animationUrl: "/animations/epidaure.html",
         enonceUrl: "/animations/epidaure-enonce.pdf",
-        travauxUrl: "", // À remplir avec le lien La Digitale
+        travauxUrl: "https://digipad.app/p/1505390/d01fffc6f40fc8",
       },
     ]
   },
