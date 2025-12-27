@@ -17,40 +17,58 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
         }
         h1 {
             color: #eee;
-            margin-bottom: 10px;
-            font-size: 1.8em;
+            margin-bottom: 5px;
+            font-size: 1.5em;
+            text-align: center;
         }
         .subtitle {
             color: #888;
-            margin-bottom: 20px;
-            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-size: 0.85em;
             text-align: center;
+            padding: 0 10px;
         }
         .container {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
+            width: 100%;
+            max-width: 1100px;
         }
         .canvas-container {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             overflow: hidden;
+            width: 100%;
+            max-width: 700px;
         }
         #canvas {
             display: block;
+            width: 100%;
+            height: auto;
         }
         .controls {
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
-            padding: 20px;
-            min-width: 320px;
+            padding: 15px;
+            width: 100%;
             max-width: 360px;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body { padding: 10px 5px; }
+            h1 { font-size: 1.3em; }
+            .subtitle { font-size: 0.75em; margin-bottom: 10px; }
+            .container { flex-direction: column; align-items: center; }
+            .canvas-container { max-width: 100%; border-radius: 8px; }
+            .controls { max-width: 100%; padding: 12px; }
         }
 
         /* Mode tabs */
@@ -235,7 +253,7 @@
 
     <div class="container">
         <div class="canvas-container">
-            <svg id="canvas" width="700" height="550"></svg>
+            <svg id="canvas" viewBox="0 0 700 550" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
 
         <div class="controls">

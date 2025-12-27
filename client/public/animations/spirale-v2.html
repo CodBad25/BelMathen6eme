@@ -49,17 +49,31 @@
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             overflow: hidden;
+            width: 100%;
+            max-width: 600px;
         }
         #canvas {
             display: block;
+            width: 100%;
+            height: auto;
             cursor: default;
         }
         .controls {
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
             padding: 20px;
-            min-width: 320px;
+            width: 100%;
             max-width: 360px;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body { padding: 10px 5px; }
+            h1 { font-size: 1.3em; }
+            .subtitle { font-size: 0.75em; margin-bottom: 10px; }
+            .container { flex-direction: column; align-items: center; }
+            .canvas-container { max-width: 100%; border-radius: 8px; }
+            .controls { max-width: 100%; padding: 12px; }
         }
         .mode-tabs {
             display: flex;
@@ -193,7 +207,7 @@
 
     <div class="container">
         <div class="canvas-container">
-            <svg id="canvas" width="600" height="550"></svg>
+            <svg id="canvas" viewBox="0 0 600 550" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
 
         <div class="controls">
