@@ -183,8 +183,9 @@ function setupAnimationMode() {
 function applyZoom(scale, updateSlider = true) {
     if (!zoomGroup) return;
 
-    const svgWidth = canvas.width;
-    const svgHeight = canvas.height;
+    // Utiliser les dimensions du viewBox (700x600) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 700;
+    const svgHeight = canvas.height || 600;
 
     // Centre du SVG
     const cx = svgWidth / 2;
