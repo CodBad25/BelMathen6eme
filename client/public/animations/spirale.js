@@ -174,8 +174,9 @@ function setupAnimationMode() {
 function applyZoom(scale, updateSlider = true) {
     if (!zoomGroup) return;
 
-    const svgWidth = canvas.width;
-    const svgHeight = canvas.height;
+    // Utiliser les dimensions du viewBox (700x600) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 700;
+    const svgHeight = canvas.height || 600;
 
     // Centre du SVG
     const cx = svgWidth / 2;
@@ -795,10 +796,11 @@ async function buildSpiralAnimated() {
     // Petit zoom avant pour la célébration
     await animateZoomTo(ZOOM_END + 0.15, 800);
 
-    const svgWidth = canvas.width;
-    const svgHeight = canvas.height;
+    // Utiliser les dimensions du viewBox (700x600) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 700;
+    const svgHeight = canvas.height || 600;
 
-    // Confettis
+    // Confettis - dispersés sur toute la largeur
     const confettiColors = ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6', '#e91e63'];
     const confettis = [];
 
