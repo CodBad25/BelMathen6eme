@@ -1,27 +1,21 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { RotateCcw } from "lucide-react";
 import { useClasse } from "@/contexts/ClasseContext";
+import { trpc } from "@/lib/trpc";
 
-// Données des méthodes par chapitre - version courte pour la liste
-const methodesByChapter: Record<string, { id: string; title: string; shortTitle: string; icon: string; description: string }[]> = {
-  "chapitre-2-prix": [
-    {
-      id: "M2.1",
-      title: "M2.1 - Comparer deux nombres décimaux",
-      shortTitle: "Comparer des décimaux",
-      icon: "🔢",
-      description: "Savoir quel nombre est le plus grand"
-    },
-    {
-      id: "M2.2",
-      title: "M2.2 - Calculer une différence",
-      shortTitle: "Calculer une différence",
-      icon: "➖",
-      description: "Trouver l'écart entre deux prix"
-    }
-  ]
+// Types de JAMP possibles
+type JampType = "Méthode" | "Définition" | "Formule" | "Propriété" | "Astuce";
+
+// Couleurs par type (cohérent avec ExerciceDetailPage)
+const typeColors: Record<JampType, string> = {
+  "Méthode": "bg-violet-100 text-violet-700",
+  "Définition": "bg-red-100 text-red-700",
+  "Formule": "bg-blue-100 text-blue-700",
+  "Propriété": "bg-orange-100 text-orange-700",
+  "Astuce": "bg-pink-100 text-pink-700",
 };
 
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
@@ -32,13 +26,42 @@ const grandeurs: Record<string, { name: string; icon: string; color: string }> =
   "chapitre-5-volumes": { name: "Les Volumes", icon: "📦", color: "from-purple-500 to-violet-600" },
 };
 
-export default function MethodesPage() {
+export default function JampPage() {
   const { chapterId } = useParams<{ chapterId: string }>();
   const { classe, isClasseView } = useClasse();
   const linkPrefix = isClasseView ? `/${classe}` : "";
 
+  // Fetch JAMPs from database
+  const { data: allJamps, isLoading } = trpc.jamps.byChapter.useQuery(
+    { chapterId: chapterId || "" },
+    { enabled: !!chapterId }
+  );
+
+  // Filter only visible JAMPs for students (class view)
+  const jamps = isClasseView
+    ? allJamps?.filter(j => j.visible) || []
+    : allJamps || [];
+
   const grandeur = chapterId ? grandeurs[chapterId] : null;
-  const methodes = chapterId ? methodesByChapter[chapterId] || [] : [];
+
+  if (isLoading) {
+    return (
+      <div className="h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col overflow-hidden">
+        <header className="bg-gradient-to-r from-violet-500 to-purple-600 text-white py-[2vh] md:py-6 px-4 shadow-lg">
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-8 w-48 bg-purple-400" />
+          </div>
+        </header>
+        <main className="flex-1 max-w-4xl mx-auto p-[3vw] md:p-6 w-full">
+          <div className="grid grid-cols-2 gap-[3vw] md:gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-40 rounded-lg" />
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   if (!grandeur) {
     return (
@@ -55,7 +78,7 @@ export default function MethodesPage() {
 
   return (
     <div className="h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col overflow-hidden">
-      <header className={`bg-gradient-to-r ${grandeur.color} text-white py-[2vh] md:py-6 px-4 shadow-lg`}>
+      <header className="bg-gradient-to-r from-violet-500 to-purple-600 text-white py-[2vh] md:py-6 px-4 shadow-lg">
         <div className="max-w-4xl mx-auto">
           <p className="text-[2vw] md:text-sm opacity-75 text-center">Réalisé avec ❤️ par M.BELHAJ</p>
           <div className="flex items-center gap-[2vw] md:gap-3">
@@ -81,29 +104,30 @@ export default function MethodesPage() {
 
       <main className="flex-1 max-w-4xl mx-auto p-[3vw] md:p-6 w-full flex flex-col">
         <div className="text-center mb-[2vh] md:mb-6">
-          <h2 className="text-[4vw] md:text-xl font-bold text-gray-800">Choisis ce que tu veux réviser</h2>
+          <h2 className="text-[4vw] md:text-xl font-bold text-gray-800">J'Apprends à Mi-Parcours</h2>
+          <p className="text-[3vw] md:text-sm text-gray-500">Choisis ce que tu veux réviser</p>
         </div>
 
-        {methodes.length === 0 ? (
+        {jamps.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-lg text-gray-500">Aucun JAMP disponible.</p>
           </div>
         ) : (
           <div className="flex-1 grid grid-cols-2 gap-[3vw] md:gap-6 content-center">
-            {methodes.map((methode) => (
-              <Link key={methode.id} href={`${linkPrefix}/grandeur/${chapterId}/jamp/${methode.id}`}>
+            {jamps.map((jamp) => (
+              <Link key={jamp.id} href={`${linkPrefix}/grandeur/${chapterId}/jamp/${jamp.id}`}>
                 <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full bg-white">
                   <CardContent className="p-[3vw] md:p-6 flex flex-col items-center text-center h-full justify-center">
-                    <span className="text-[12vw] md:text-6xl mb-[1vh] md:mb-3">{methode.icon}</span>
-                    <h3 className="font-bold text-[4vw] md:text-lg text-gray-800 group-hover:text-green-600 transition-colors mb-1">
-                      {methode.shortTitle}
+                    <span className="text-[12vw] md:text-6xl mb-[1vh] md:mb-3">{jamp.icon || "📚"}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[2.5vw] md:text-xs font-medium mb-2 ${typeColors[jamp.type as JampType] || "bg-gray-100 text-gray-700"}`}>
+                      {jamp.type}
+                    </span>
+                    <h3 className="font-bold text-[4vw] md:text-lg text-gray-800 group-hover:text-violet-600 transition-colors mb-1">
+                      {jamp.title}
                     </h3>
                     <p className="text-[3vw] md:text-sm text-gray-600">
-                      {methode.description}
+                      {jamp.description}
                     </p>
-                    <div className="mt-[1vh] md:mt-3 px-3 py-1 bg-green-100 text-green-700 rounded-full text-[2.5vw] md:text-xs font-medium">
-                      {methode.id}
-                    </div>
                   </CardContent>
                 </Card>
               </Link>

@@ -5,6 +5,7 @@ import { Route, Switch, useParams } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ClasseProvider } from "./contexts/ClasseContext";
+import { AdminLock } from "./components/AdminLock";
 import Home from "./pages/Home";
 import ChapterPage from "./pages/ChapterPage";
 import SectionPage from "./pages/SectionPage";
@@ -12,7 +13,10 @@ import CoursEleves from "./pages/CoursEleves";
 import Admin from "./pages/Admin";
 import AdminGestion from "./pages/AdminGestion";
 import AdminDragDrop from "./pages/AdminDragDrop";
+import AdminJamp from "./pages/AdminJamp";
 import PdfViewer from "./pages/PdfViewer";
+import JampPage from "./pages/JampPage";
+import JampDetailPage from "./pages/JampDetailPage";
 import MethodesPage from "./pages/MethodesPage";
 import MethodeDetailPage from "./pages/MethodeDetailPage";
 import ExercicesPage from "./pages/ExercicesPage";
@@ -38,8 +42,8 @@ function ClasseRoutes() {
       <Switch>
         <Route path={`/${classe}`} component={Home} />
         <Route path={`/${classe}/grandeur/:chapterId`} component={ChapterPage} />
-        <Route path={`/${classe}/grandeur/:chapterId/methodes`} component={MethodesPage} />
-        <Route path={`/${classe}/grandeur/:chapterId/methodes/:methodeId`} component={MethodeDetailPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/jamp`} component={MethodesPage} />
+        <Route path={`/${classe}/grandeur/:chapterId/jamp/:jampId`} component={MethodeDetailPage} />
         <Route path={`/${classe}/grandeur/:chapterId/ia-ressources`} component={IAResourcesPage} />
         <Route path={`/${classe}/grandeur/:chapterId/cours`} component={CoursDetailPage} />
         <Route path={`/${classe}/grandeur/:chapterId/:sectionId/exercices`} component={ExercicesPage} />
@@ -66,8 +70,8 @@ function Router() {
         {/* Routes sans classe (mode prof/admin - voit tout) */}
         <Route path={"/"} component={Home} />
         <Route path={"/grandeur/:chapterId"} component={ChapterPage} />
-        <Route path={"/grandeur/:chapterId/methodes"} component={MethodesPage} />
-        <Route path={"/grandeur/:chapterId/methodes/:methodeId"} component={MethodeDetailPage} />
+        <Route path={"/grandeur/:chapterId/jamp"} component={MethodesPage} />
+        <Route path={"/grandeur/:chapterId/jamp/:jampId"} component={MethodeDetailPage} />
         <Route path={"/grandeur/:chapterId/ia-ressources"} component={IAResourcesPage} />
         <Route path={"/grandeur/:chapterId/cours"} component={CoursDetailPage} />
         <Route path={"/grandeur/:chapterId/:sectionId/exercices"} component={ExercicesPage} />
@@ -78,6 +82,7 @@ function Router() {
         <Route path={"/cours/:chapterId"} component={CoursEleves} />
         <Route path={"/admin"} component={Admin} />
         <Route path={"/admin/gestion"} component={AdminGestion} />
+        <Route path={"/admin/jamp"} component={AdminJamp} />
         <Route path={"/admin/ordre"} component={AdminDragDrop} />
         <Route path={"/404"} component={NotFound} />
         {/* Final fallback route */}
@@ -102,6 +107,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <AdminLock />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

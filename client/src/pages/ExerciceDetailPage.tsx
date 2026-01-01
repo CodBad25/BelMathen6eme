@@ -5,6 +5,23 @@ import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock, Play, Image, FileD
 import { useState } from "react";
 import InteractiveExercise from "@/components/InteractiveExercise";
 
+// Types de JAMP et leurs couleurs
+type JampType = "Méthode" | "Définition" | "Formule" | "Propriété" | "Astuce";
+
+const jampTypeColors: Record<JampType, { bg: string; hover: string; text: string }> = {
+  "Méthode": { bg: "bg-violet-100", hover: "hover:bg-violet-200", text: "text-violet-700" },
+  "Définition": { bg: "bg-red-100", hover: "hover:bg-red-200", text: "text-red-700" },
+  "Formule": { bg: "bg-blue-100", hover: "hover:bg-blue-200", text: "text-blue-700" },
+  "Propriété": { bg: "bg-orange-100", hover: "hover:bg-orange-200", text: "text-orange-700" },
+  "Astuce": { bg: "bg-pink-100", hover: "hover:bg-pink-200", text: "text-pink-700" },
+};
+
+// Mapping des JAMP vers leur type
+const jampTypes: Record<string, JampType> = {
+  "jamp-comparer-decimaux": "Méthode",
+  "jamp-calculer-difference": "Méthode",
+};
+
 // Structure détaillée des exercices avec les vrais énoncés
 const exercicesDetail: Record<string, {
   title: string;
@@ -17,7 +34,7 @@ const exercicesDetail: Record<string, {
     enonce: React.ReactNode;
     correctionImages?: string[];
     correctionText?: string;
-    methodeId?: string;
+    jampId?: string;
     iaResources?: {
       video?: string;
       image?: string;
@@ -39,7 +56,7 @@ const exercicesDetail: Record<string, {
           <p>Quelle est la station la moins chère ? Quelle est la différence de prix entre les deux stations ?</p>
         ),
         correctionImages: ["/exercices/prix/ex1/ex1_a_1.png", "/exercices/prix/ex1/ex1_a_2.png"],
-        methodeId: "M2.1",
+        jampId: "jamp-comparer-decimaux",
         iaResources: {
           video: "/ia-ressources/ex1/video_comparer_decimaux.mp4",
           image: "/ia-ressources/ex1/comparer_nombres_q1a.png",
@@ -52,7 +69,7 @@ const exercicesDetail: Record<string, {
           <p>Je dois mettre <strong>10 ℓ</strong> de gazole dans ma voiture, quelle sera la différence entre les prix à payer ? Si je donne <strong>20 €</strong> au pompiste, calcule la monnaie rendue dans chaque station.</p>
         ),
         correctionImages: ["/exercices/prix/ex1/6A_Correction 1_1.png", "/exercices/prix/ex1/6A_Correction 1_2.png"],
-        methodeId: "M2.2",
+        jampId: "jamp-calculer-difference",
         iaResources: {
           video: "/ia-ressources/ex1/video_difference_prix.mp4",
           image: "/ia-ressources/ex1/ecart_prix_q1b.png",
@@ -263,12 +280,12 @@ const exercicesDetail: Record<string, {
 
 // État de visibilité (simulé - en vrai ce serait en base de données)
 // Pour l'instant on simule : seules les corrections de ex1 sont visibles
-const visibilityState: Record<string, Record<string, { correction: boolean; methode: boolean }>> = {
+const visibilityState: Record<string, Record<string, { correction: boolean; jamp: boolean }>> = {
   "ex1": {
-    "a": { correction: true, methode: true },
-    "b": { correction: true, methode: true },
-    "c": { correction: true, methode: false },
-    "d": { correction: true, methode: false },
+    "a": { correction: true, jamp: true },
+    "b": { correction: true, jamp: true },
+    "c": { correction: true, jamp: false },
+    "d": { correction: true, jamp: false },
   }
 };
 
@@ -404,7 +421,7 @@ export default function ExerciceDetailPage() {
 
   const closeModal = () => setModal(null);
 
-  const isVisible = (questionId: string, type: "correction" | "methode") => {
+  const isVisible = (questionId: string, type: "correction" | "jamp") => {
     return visibility[questionId]?.[type] ?? false;
   };
 
@@ -479,22 +496,24 @@ export default function ExerciceDetailPage() {
                     )
                   )}
 
-                  {/* Bouton Méthode */}
-                  {question.methodeId && (
-                    isVisible(question.id, "methode") ? (
-                      <Link href={`/grandeur/${chapterId}/methodes/${question.methodeId}`}>
-                        <button className="flex items-center gap-[1.5vw] md:gap-2 px-[2.5vw] py-[1.5vw] md:px-3 md:py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-full transition-colors text-[3vw] md:text-sm font-medium">
+                  {/* Bouton JAMP */}
+                  {question.jampId && (() => {
+                    const jampType = jampTypes[question.jampId] || "Méthode";
+                    const colors = jampTypeColors[jampType];
+                    return isVisible(question.id, "jamp") ? (
+                      <Link href={`/grandeur/${chapterId}/jamp/${question.jampId}`}>
+                        <button className={`flex items-center gap-[1.5vw] md:gap-2 px-[2.5vw] py-[1.5vw] md:px-3 md:py-1.5 ${colors.bg} ${colors.hover} ${colors.text} rounded-full transition-colors text-[3vw] md:text-sm font-medium`} title="J'Apprends à Mi-Parcours">
                           <BookOpen className="w-[3.5vw] h-[3.5vw] md:w-4 md:h-4" />
-                          {question.methodeId}
+                          JAMP
                         </button>
                       </Link>
                     ) : (
-                      <div className="flex items-center gap-[1.5vw] md:gap-2 px-[2.5vw] py-[1.5vw] md:px-3 md:py-1.5 bg-gray-100 text-gray-400 rounded-full text-[3vw] md:text-sm font-medium cursor-not-allowed">
+                      <div className="flex items-center gap-[1.5vw] md:gap-2 px-[2.5vw] py-[1.5vw] md:px-3 md:py-1.5 bg-gray-100 text-gray-400 rounded-full text-[3vw] md:text-sm font-medium cursor-not-allowed" title="J'Apprends à Mi-Parcours">
                         <Lock className="w-[3.5vw] h-[3.5vw] md:w-4 md:h-4" />
-                        {question.methodeId}
+                        JAMP
                       </div>
-                    )
-                  )}
+                    );
+                  })()}
 
                   {/* Bouton IA "Mon AMIE IA MAIS..." */}
                   {question.iaResources && (

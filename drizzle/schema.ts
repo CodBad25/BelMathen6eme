@@ -1,4 +1,4 @@
-import { integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { integer, pgEnum, pgTable, text, timestamp, varchar, boolean } from "drizzle-orm/pg-core";
 
 /**
  * Core user table backing auth flow.
@@ -58,3 +58,33 @@ export const stats = pgTable("stats", {
 });
 
 export type Stat = typeof stats.$inferSelect;
+
+// JAMP (J'Apprends à Mi-Parcours) - Simplifié : 1 JAMP = 1 contenu
+export const jampTypeEnum = pgEnum("jampType", ["Méthode", "Définition", "Formule", "Propriété", "Astuce"]);
+export const jampContentTypeEnum = pgEnum("jampContentType", ["image", "video", "pdf"]);
+
+export const jamps = pgTable("jamps", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  chapterId: varchar("chapterId", { length: 64 }).notNull(),
+  title: text("title").notNull(),
+  type: jampTypeEnum("type").notNull(),
+  icon: text("icon").default("📚"),
+  description: text("description"),
+  // Contenu direct (plus de slides)
+  contentType: jampContentTypeEnum("contentType"),
+  contentUrl: text("contentUrl"),
+  displayOrder: integer("displayOrder").default(0).notNull(),
+  visible: boolean("visible").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Jamp = typeof jamps.$inferSelect;
+export type InsertJamp = typeof jamps.$inferInsert;
+
+// Exercices masqués (par défaut tout est visible, on stocke seulement les masqués)
+export const hiddenExercices = pgTable("hiddenExercices", {
+  id: varchar("id", { length: 128 }).primaryKey(), // Format: "chapitre-2-prix/etude-1/ex1"
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type HiddenExercice = typeof hiddenExercices.$inferSelect;

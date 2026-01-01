@@ -231,6 +231,119 @@ export const appRouter = router({
       return { count: await incrementVisitCount() };
     }),
   }),
+
+  settings: router({
+    // Récupère les classes actives
+    getActiveClasses: publicProcedure.query(async () => {
+      const { getActiveClasses } = await import("./db");
+      return { classes: await getActiveClasses() };
+    }),
+
+    // Met à jour les classes actives (admin only)
+    setActiveClasses: protectedProcedure
+      .input(z.object({ classes: z.array(z.enum(["6A", "6B", "6C", "6D"])) }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Seuls les administrateurs peuvent modifier les classes actives");
+        }
+        const { setActiveClasses } = await import("./db");
+        return setActiveClasses(input.classes);
+      }),
+  }),
+
+  jamps: router({
+    // Liste tous les JAMP
+    list: publicProcedure.query(async () => {
+      const { getAllJamps } = await import("./db");
+      return getAllJamps();
+    }),
+
+    // Liste les JAMP d'un chapitre
+    byChapter: publicProcedure
+      .input(z.object({ chapterId: z.string() }))
+      .query(async ({ input }) => {
+        const { getJampsByChapter } = await import("./db");
+        return getJampsByChapter(input.chapterId);
+      }),
+
+    // Récupère un JAMP par ID
+    getById: publicProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input }) => {
+        const { getJampById } = await import("./db");
+        return getJampById(input.id);
+      }),
+
+    // Crée un JAMP (avec contenu direct)
+    create: protectedProcedure
+      .input(z.object({
+        chapterId: z.string(),
+        title: z.string(),
+        type: z.enum(["Méthode", "Définition", "Formule", "Propriété", "Astuce"]),
+        icon: z.string().optional(),
+        description: z.string().optional(),
+        contentType: z.enum(["image", "video", "pdf"]).optional(),
+        contentUrl: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Seuls les administrateurs peuvent créer des JAMP");
+        }
+        const { createJamp } = await import("./db");
+        return createJamp(input);
+      }),
+
+    // Met à jour un JAMP
+    update: protectedProcedure
+      .input(z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        type: z.enum(["Méthode", "Définition", "Formule", "Propriété", "Astuce"]).optional(),
+        icon: z.string().optional(),
+        description: z.string().optional(),
+        contentType: z.enum(["image", "video", "pdf"]).optional(),
+        contentUrl: z.string().optional(),
+        visible: z.boolean().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Seuls les administrateurs peuvent modifier des JAMP");
+        }
+        const { updateJamp } = await import("./db");
+        return updateJamp(input);
+      }),
+
+    // Supprime un JAMP
+    delete: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Seuls les administrateurs peuvent supprimer des JAMP");
+        }
+        const { deleteJamp } = await import("./db");
+        return deleteJamp(input.id);
+      }),
+  }),
+
+  exercices: router({
+    // Liste les exercices masqués
+    getHidden: publicProcedure.query(async () => {
+      const { getHiddenExercices } = await import("./db");
+      return { hidden: await getHiddenExercices() };
+    }),
+
+    // Toggle la visibilité d'un exercice (admin only)
+    toggleVisibility: protectedProcedure
+      .input(z.object({ exerciceId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Seuls les administrateurs peuvent masquer des exercices");
+        }
+        const { toggleExerciceVisibility } = await import("./db");
+        return toggleExerciceVisibility(input.exerciceId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

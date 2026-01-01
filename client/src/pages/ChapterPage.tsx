@@ -6,8 +6,8 @@ import { Home, BookOpen, Bot, GraduationCap } from "lucide-react";
 import { useFilteredResources } from "@/hooks/useFilteredResources";
 import { useClasse } from "@/contexts/ClasseContext";
 
-// Chapitres qui ont des méthodes disponibles
-const chaptersWithMethods = ["chapitre-2-prix"];
+// Chapitres qui ont des JAMP disponibles
+const chaptersWithJamp = ["chapitre-1-angles", "chapitre-2-prix", "chapitre-3-aires", "chapitre-4-durees", "chapitre-5-volumes"];
 
 // Chapitres qui ont des ressources IA disponibles
 const chaptersWithIA = ["chapitre-2-prix"];
@@ -182,11 +182,11 @@ export default function ChapterPage() {
                 </Button>
               </Link>
             )}
-            {chapterId && chaptersWithMethods.includes(chapterId) && (
-              <Link href={`${linkPrefix}/grandeur/${chapterId}/methodes`}>
-                <Button variant="outline" className="gap-2 text-green-700 border-green-500 hover:bg-green-50">
+            {chapterId && chaptersWithJamp.includes(chapterId) && (
+              <Link href={`${linkPrefix}/grandeur/${chapterId}/jamp`}>
+                <Button variant="outline" className="gap-2 text-violet-700 border-violet-500 hover:bg-violet-50" title="J'Apprends à Mi-Parcours">
                   <BookOpen className="w-4 h-4" />
-                  Méthodes du chapitre
+                  JAMP
                 </Button>
               </Link>
             )}

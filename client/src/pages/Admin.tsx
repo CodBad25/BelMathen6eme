@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
@@ -11,9 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Eye, EyeOff, LogOut, Lock, Users, Check } from "lucide-react";
 import { toast } from "sonner";
-
-// Classes actives sauvegardées dans localStorage
-const ACTIVE_CLASSES_KEY = "maths6e_active_classes";
 
 function LoginForm() {
   const [password, setPassword] = useState("");
@@ -100,32 +97,38 @@ export default function Admin() {
   const { user, loading: authLoading, logout } = useAuth();
   const { data: resources, isLoading, error, refetch } = trpc.resources.list.useQuery();
 
-  // État des classes actives (sauvegardé dans localStorage)
-  const [activeClasses, setActiveClasses] = useState<string[]>(() => {
-    const saved = localStorage.getItem(ACTIVE_CLASSES_KEY);
-    return saved ? JSON.parse(saved) : ["6A", "6B", "6C", "6D"]; // Par défaut toutes actives
+  // Charger les classes actives depuis la base de données
+  const { data: activeClassesData, isLoading: classesLoading } = trpc.settings.getActiveClasses.useQuery();
+  const activeClasses = activeClassesData?.classes || ["6A", "6B", "6C", "6D"];
+
+  // Mutation pour sauvegarder les classes actives
+  const setActiveClassesMutation = trpc.settings.setActiveClasses.useMutation({
+    onSuccess: () => {
+      // Pas besoin de refetch car on met à jour l'état local
+    },
+    onError: (error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
   });
 
-  // Sauvegarder dans localStorage quand ça change
-  useEffect(() => {
-    localStorage.setItem(ACTIVE_CLASSES_KEY, JSON.stringify(activeClasses));
-  }, [activeClasses]);
-
   const toggleActiveClass = (classe: string) => {
-    setActiveClasses(prev => {
-      if (prev.includes(classe)) {
-        // Ne pas désactiver si c'est la dernière classe active
-        if (prev.length === 1) {
-          toast.error("Vous devez garder au moins une classe active");
-          return prev;
-        }
-        toast.success(`Classe ${classe} désactivée`);
-        return prev.filter(c => c !== classe);
-      } else {
-        toast.success(`Classe ${classe} activée`);
-        return [...prev, classe];
+    let newClasses: ("6A" | "6B" | "6C" | "6D")[];
+
+    if (activeClasses.includes(classe)) {
+      // Ne pas désactiver si c'est la dernière classe active
+      if (activeClasses.length === 1) {
+        toast.error("Vous devez garder au moins une classe active");
+        return;
       }
-    });
+      newClasses = activeClasses.filter(c => c !== classe) as ("6A" | "6B" | "6C" | "6D")[];
+      toast.success(`Classe ${classe} désactivée`);
+    } else {
+      newClasses = [...activeClasses, classe] as ("6A" | "6B" | "6C" | "6D")[];
+      toast.success(`Classe ${classe} activée`);
+    }
+
+    // Sauvegarder dans la base de données
+    setActiveClassesMutation.mutate({ classes: newClasses });
   };
 
   const toggleMutation = trpc.resources.toggleVisibility.useMutation({
@@ -148,7 +151,7 @@ export default function Admin() {
     },
   });
 
-  if (authLoading || isLoading) {
+  if (authLoading || isLoading || classesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto space-y-6">
@@ -297,6 +300,9 @@ export default function Admin() {
               <Link href="/admin/gestion">
                 <Button variant="outline" size="sm">Gérer</Button>
               </Link>
+              <Link href="/admin/jamp">
+                <Button variant="outline" size="sm">JAMP</Button>
+              </Link>
               <Link href="/admin/ordre">
                 <Button variant="outline" size="sm">Réorganiser</Button>
               </Link>
@@ -420,51 +426,96 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              {chapter.sections.map((section) => (
-                <div key={section.id}>
-                  <h3 className="text-lg font-semibold text-purple-700 mb-3 pb-2 border-b border-purple-200">
-                    {section.title}
-                  </h3>
-                  <div className="space-y-2">
-                    {section.resources.map((resource) => (
-                      <div
-                        key={resource.id}
-                        className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">{resource.icon || "📄"}</div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900">{resource.title}</p>
-                            {resource.description && (
-                              <p className="text-sm text-gray-600">{resource.description}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 text-sm">
-                            {resource.visible === "true" ? (
-                              <>
-                                <Eye className="w-4 h-4 text-green-600" />
-                                <span className="text-green-600 font-medium">Visible</span>
-                              </>
-                            ) : (
-                              <>
-                                <EyeOff className="w-4 h-4 text-gray-400" />
-                                <span className="text-gray-400 font-medium">Masqué</span>
-                              </>
-                            )}
-                          </div>
-                          <Switch
-                            checked={resource.visible === "true"}
-                            onCheckedChange={() => handleToggle(resource.id, resource.visible)}
-                            disabled={toggleMutation.isPending}
-                          />
-                        </div>
+              {chapter.sections.map((section) => {
+                const allVisible = section.resources.every(r => r.visible === "true");
+                const noneVisible = section.resources.every(r => r.visible === "false");
+                const visibleCount = section.resources.filter(r => r.visible === "true").length;
+
+                const handleToggleSection = () => {
+                  // Si tout est visible, on masque tout. Sinon, on rend tout visible.
+                  const newVisible = allVisible ? "false" : "true";
+                  section.resources.forEach(resource => {
+                    if (resource.visible !== newVisible) {
+                      toggleMutation.mutate({ id: resource.id, visible: newVisible });
+                    }
+                  });
+                };
+
+                return (
+                  <div key={section.id}>
+                    <div
+                      onClick={handleToggleSection}
+                      className={`flex items-center justify-between mb-3 pb-2 border-b-2 cursor-pointer transition-all hover:bg-gray-50 rounded px-2 py-1 -mx-2 ${
+                        allVisible
+                          ? "border-green-400"
+                          : noneVisible
+                            ? "border-gray-300"
+                            : "border-yellow-400"
+                      }`}
+                    >
+                      <h3 className="text-lg font-semibold text-purple-700">
+                        {section.title}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          allVisible
+                            ? "bg-green-100 text-green-700"
+                            : noneVisible
+                              ? "bg-gray-100 text-gray-500"
+                              : "bg-yellow-100 text-yellow-700"
+                        }`}>
+                          {visibleCount}/{section.resources.length}
+                        </span>
+                        {allVisible ? (
+                          <Eye className="w-5 h-5 text-green-600" />
+                        ) : noneVisible ? (
+                          <EyeOff className="w-5 h-5 text-gray-400" />
+                        ) : (
+                          <Eye className="w-5 h-5 text-yellow-500" />
+                        )}
                       </div>
-                    ))}
+                    </div>
+                    <div className="space-y-2">
+                      {section.resources.map((resource) => (
+                        <div
+                          key={resource.id}
+                          className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="text-2xl">{resource.icon || "📄"}</div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900">{resource.title}</p>
+                              {resource.description && (
+                                <p className="text-sm text-gray-600">{resource.description}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              {resource.visible === "true" ? (
+                                <>
+                                  <Eye className="w-4 h-4 text-green-600" />
+                                  <span className="text-green-600 font-medium">Visible</span>
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="w-4 h-4 text-gray-400" />
+                                  <span className="text-gray-400 font-medium">Masqué</span>
+                                </>
+                              )}
+                            </div>
+                            <Switch
+                              checked={resource.visible === "true"}
+                              onCheckedChange={() => handleToggle(resource.id, resource.visible)}
+                              disabled={toggleMutation.isPending}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </CardContent>
           </Card>
         ))}

@@ -11,16 +11,12 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
-// Récupérer les classes actives depuis localStorage
-const ACTIVE_CLASSES_KEY = "maths6e_active_classes";
-const getActiveClasses = (): string[] => {
-  const saved = localStorage.getItem(ACTIVE_CLASSES_KEY);
-  return saved ? JSON.parse(saved) : ["6A", "6B", "6C", "6D"];
-};
-
 export default function AdminGestion() {
   const { user, loading: authLoading } = useAuth();
-  const [activeClasses] = useState<string[]>(getActiveClasses);
+
+  // Charger les classes actives depuis la base de données
+  const { data: activeClassesData, isLoading: classesLoading } = trpc.settings.getActiveClasses.useQuery();
+  const activeClasses = activeClassesData?.classes || ["6A", "6B", "6C", "6D"];
   const { data: resources, isLoading, refetch } = trpc.resources.list.useQuery();
   const toggleVisibility = trpc.resources.toggleVisibility.useMutation({
     onSuccess: () => {
@@ -139,7 +135,7 @@ export default function AdminGestion() {
     createMutation.mutate(formData);
   };
 
-  if (authLoading || isLoading) {
+  if (authLoading || isLoading || classesLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="animate-spin" />

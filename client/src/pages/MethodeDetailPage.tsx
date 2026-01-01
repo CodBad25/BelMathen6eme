@@ -1,8 +1,20 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw, BookOpen } from "lucide-react";
 import { useState } from "react";
+
+// Alias pour les anciens liens
+const jampIdAliases: Record<string, string> = {
+  "jamp-comparer-decimaux": "M2.1",
+  "jamp-calculer-difference": "M2.2",
+};
+
+// Mapping JAMP → lien vers l'exercice correspondant
+const jampToExercice: Record<string, { path: string; label: string }> = {
+  "M2.1": { path: "/grandeur/chapitre-2-prix/etude-1/exercices/ex1", label: "Exercice 1" },
+  "M2.2": { path: "/grandeur/chapitre-2-prix/etude-1/exercices/ex1", label: "Exercice 1" },
+};
 
 // Contenu simplifié des méthodes - chaque "étape" est une slide
 const methodesContent: Record<string, {
@@ -248,7 +260,9 @@ const grandeurs: Record<string, { name: string; icon: string; color: string }> =
 };
 
 export default function MethodeDetailPage() {
-  const { chapterId, methodeId } = useParams<{ chapterId: string; methodeId: string }>();
+  const { chapterId, jampId } = useParams<{ chapterId: string; jampId: string }>();
+  // Support des anciens liens (alias) et des nouveaux IDs
+  const methodeId = jampId ? (jampIdAliases[jampId] || jampId) : undefined;
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const grandeur = chapterId ? grandeurs[chapterId] : null;
@@ -258,7 +272,7 @@ export default function MethodeDetailPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600">Méthode non trouvée</p>
+          <p className="text-xl text-gray-600">JAMP non trouvé</p>
           <Link href="/">
             <Button className="mt-4">Retour à l'accueil</Button>
           </Link>
@@ -282,10 +296,13 @@ export default function MethodeDetailPage() {
     }
   };
 
+  const exerciceLink = methodeId ? jampToExercice[methodeId] : null;
+
   return (
     <div className="h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col overflow-hidden">
+      {/* Header */}
       <header className={`bg-gradient-to-r ${methode.color} text-white py-[2vh] md:py-4 px-4 shadow-lg`}>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-[2vw] md:gap-3">
             <Button
               variant="secondary"
@@ -299,22 +316,23 @@ export default function MethodeDetailPage() {
             <div className="flex items-center gap-[2vw]">
               <span className="text-[8vw] md:text-4xl">{methode.icon}</span>
               <div>
-                <h1 className="text-[4vw] md:text-xl font-bold">{methodeId}</h1>
-                <p className="text-[3vw] md:text-sm opacity-90">{methode.title}</p>
+                <h1 className="text-[4vw] md:text-xl font-bold">{methodeId} - {methode.title}</h1>
+                <p className="text-[3vw] md:text-sm opacity-90">JAMP - J'Apprends à Mi-Parcours</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col p-[3vw] md:p-6 overflow-hidden">
-        {/* Indicateurs de slide */}
-        <div className="flex justify-center gap-2 mb-[2vh] md:mb-4">
+      {/* MOBILE: Layout classique */}
+      <main className="flex-1 flex flex-col p-[3vw] overflow-hidden md:hidden">
+        {/* Indicateurs de slide (mobile) */}
+        <div className="flex justify-center gap-2 mb-[2vh]">
           {methode.slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`w-[2.5vw] h-[2.5vw] md:w-3 md:h-3 rounded-full transition-all ${
+              className={`w-[2.5vw] h-[2.5vw] rounded-full transition-all ${
                 idx === currentSlide
                   ? "bg-green-500 scale-125"
                   : "bg-gray-300 hover:bg-gray-400"
@@ -323,10 +341,10 @@ export default function MethodeDetailPage() {
           ))}
         </div>
 
-        {/* Contenu du slide */}
-        <Card className="flex-1 max-w-2xl mx-auto w-full overflow-hidden">
-          <CardContent className="h-full flex flex-col p-[4vw] md:p-6">
-            <h2 className="text-[5vw] md:text-2xl font-bold text-center text-gray-800 mb-[3vh] md:mb-6">
+        {/* Contenu du slide (mobile) */}
+        <Card className="flex-1 w-full overflow-hidden">
+          <CardContent className="h-full flex flex-col p-[4vw]">
+            <h2 className="text-[5vw] font-bold text-center text-gray-800 mb-[3vh]">
               {slide.title}
             </h2>
             <div className="flex-1 flex items-center justify-center">
@@ -337,29 +355,151 @@ export default function MethodeDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-[2vh] md:mt-4 px-[2vw]">
+        {/* Navigation (mobile) */}
+        <div className="flex justify-between items-center mt-[2vh] px-[2vw]">
           <Button
             variant="outline"
             onClick={goPrev}
             disabled={currentSlide === 0}
-            className="h-[10vw] w-[10vw] md:h-12 md:w-12 p-0 rounded-full"
+            className="h-[10vw] w-[10vw] p-0 rounded-full"
           >
-            <ChevronLeft className="w-[5vw] h-[5vw] md:w-6 md:h-6" />
+            <ChevronLeft className="w-[5vw] h-[5vw]" />
           </Button>
 
-          <span className="text-[3.5vw] md:text-base text-gray-500">
+          <span className="text-[3.5vw] text-gray-500">
             {currentSlide + 1} / {totalSlides}
           </span>
 
-          <Button
-            variant="outline"
-            onClick={goNext}
-            disabled={currentSlide === totalSlides - 1}
-            className="h-[10vw] w-[10vw] md:h-12 md:w-12 p-0 rounded-full"
-          >
-            <ChevronRight className="w-[5vw] h-[5vw] md:w-6 md:h-6" />
-          </Button>
+          {currentSlide === totalSlides - 1 && exerciceLink ? (
+            <Link href={exerciceLink.path}>
+              <Button className="h-[10vw] px-[3vw] rounded-full bg-green-500 hover:bg-green-600 text-white">
+                <span className="text-[3vw]">Exercice</span>
+                <ChevronRight className="w-[4vw] h-[4vw] ml-1" />
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={goNext}
+              disabled={currentSlide === totalSlides - 1}
+              className="h-[10vw] w-[10vw] p-0 rounded-full"
+            >
+              <ChevronRight className="w-[5vw] h-[5vw]" />
+            </Button>
+          )}
+        </div>
+      </main>
+
+      {/* DESKTOP: Layout 2 colonnes */}
+      <main className="hidden md:flex flex-1 overflow-hidden">
+        {/* Sidebar gauche - Navigation compacte */}
+        <aside className="w-64 bg-white border-r flex flex-col">
+          <nav className="flex-1 p-3 space-y-1 overflow-auto">
+            {methode.slides.map((s, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-3 text-sm ${
+                  idx === currentSlide
+                    ? `bg-gradient-to-r ${methode.color} text-white shadow-md`
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
+              >
+                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                  idx === currentSlide ? "bg-white/30" : "bg-gray-200"
+                }`}>
+                  {idx + 1}
+                </span>
+                <span className="font-medium truncate">{s.title}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Boutons de navigation - toujours visibles */}
+          <div className="p-3 border-t bg-gray-50 space-y-2">
+            <Link href={`/grandeur/${chapterId}/jamp`}>
+              <Button variant="outline" className="w-full h-10 gap-2 text-sm border-violet-300 text-violet-700 hover:bg-violet-50">
+                <BookOpen className="w-4 h-4" />
+                Tous les JAMP
+              </Button>
+            </Link>
+
+            {exerciceLink && (
+              <Link href={exerciceLink.path}>
+                <Button className="w-full h-10 bg-green-500 hover:bg-green-600 text-white gap-2 text-sm font-semibold">
+                  <ArrowLeft className="w-4 h-4" />
+                  Retour à l'exercice
+                </Button>
+              </Link>
+            )}
+          </div>
+        </aside>
+
+        {/* Contenu principal - utilise tout l'espace */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50">
+          {/* Zone de contenu */}
+          <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
+            <div className="w-full max-w-5xl">
+              {/* Titre de la slide */}
+              <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">
+                {slide.title}
+              </h2>
+
+              {/* Contenu de la slide - grande carte */}
+              <div className="bg-white rounded-2xl shadow-lg p-8 text-lg min-h-[300px] flex items-center justify-center">
+                <div className="w-full">
+                  {slide.content}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Barre de navigation en bas */}
+          <div className="border-t bg-white px-6 py-3 flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={goPrev}
+              disabled={currentSlide === 0}
+              className="h-10 px-5 gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Précédent
+            </Button>
+
+            <div className="flex items-center gap-2">
+              {methode.slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    idx === currentSlide
+                      ? "bg-green-500 scale-125"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {currentSlide === totalSlides - 1 ? (
+              exerciceLink ? (
+                <Link href={exerciceLink.path}>
+                  <Button className="h-10 px-5 bg-green-500 hover:bg-green-600 text-white gap-2 font-semibold">
+                    Retour à l'exercice
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button disabled className="h-10 px-5 gap-2">
+                  Terminé
+                </Button>
+              )
+            ) : (
+              <Button onClick={goNext} className="h-10 px-5 gap-2 font-semibold">
+                Suivant
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </main>
     </div>

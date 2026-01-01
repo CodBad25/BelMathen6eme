@@ -10,7 +10,7 @@ const t = initTRPC.context<TrpcContext>().create({
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-const ADMIN_COOKIE = "maths4e_admin";
+const ADMIN_COOKIE = "maths6e_admin";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "secret");
 
 const requireUser = t.middleware(async opts => {

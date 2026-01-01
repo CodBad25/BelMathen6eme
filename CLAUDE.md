@@ -42,3 +42,26 @@ Les ressources ont une visibilité par classe (6A, 6B, 6C, 6D) via les champs :
 ## Classes actives
 
 Les classes actives sont stockées dans localStorage (`maths6e_active_classes`).
+
+## Masquage des exercices
+
+Les exercices peuvent être masqués/affichés par l'admin :
+- **Table** : `hiddenExercices` (stocke uniquement les IDs des exercices masqués)
+- **Format ID** : `chapitre-2-prix/etude-1/ex1`
+- **Page** : `/grandeur/{chapitre}/{section}/exercices`
+- **Usage** : Cliquer sur l'icône œil (visible uniquement en mode admin)
+- **Routes tRPC** : `exercices.getHidden`, `exercices.toggleVisibility`
+
+## Cadenas Admin
+
+Un cadenas discret est affiché en bas à droite de toutes les pages :
+- **Composant** : `client/src/components/AdminLock.tsx`
+- **Ajouté dans** : `client/src/App.tsx`
+- Redirige vers `/admin` au clic
+
+## Fichiers clés
+
+- `client/src/components/AdminLock.tsx` - Cadenas accès admin
+- `client/src/pages/ExercicesPage.tsx` - Liste exercices avec masquage
+- `server/db.ts` - Fonctions `getHiddenExercices()`, `toggleExerciceVisibility()`
+- `drizzle/schema.ts` - Table `hiddenExercices`

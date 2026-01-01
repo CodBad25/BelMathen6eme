@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { InsertUser, users } from "../drizzle/schema";
@@ -89,7 +89,7 @@ export async function getUser(id: string) {
 }
 
 // Gestion des ressources pédagogiques
-import { resources, InsertResource, Resource, stats } from "../drizzle/schema";
+import { resources, InsertResource, Resource, stats, jamps, Jamp, InsertJamp, hiddenExercices } from "../drizzle/schema";
 
 export async function getAllResources(): Promise<Resource[]> {
   const db = await getDb();
@@ -253,6 +253,204 @@ export async function incrementVisitCount(): Promise<number> {
   } catch (error) {
     console.error("[Database] Failed to increment visit count:", error);
     return 0;
+  }
+}
+
+// ========== JAMP Functions (Simplifié: 1 JAMP = 1 contenu) ==========
+
+export async function getAllJamps(): Promise<Jamp[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(jamps).orderBy(asc(jamps.displayOrder));
+}
+
+export async function getJampsByChapter(chapterId: string): Promise<Jamp[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(jamps)
+    .where(eq(jamps.chapterId, chapterId))
+    .orderBy(asc(jamps.displayOrder));
+}
+
+export async function getJampById(id: string): Promise<Jamp | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select().from(jamps).where(eq(jamps.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createJamp(data: {
+  chapterId: string;
+  title: string;
+  type: "Méthode" | "Définition" | "Formule" | "Propriété" | "Astuce";
+  icon?: string;
+  description?: string;
+  contentType?: "image" | "video" | "pdf";
+  contentUrl?: string;
+}): Promise<Jamp> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { randomUUID } = await import("crypto");
+
+  // Get max displayOrder for this chapter
+  const existing = await db.select().from(jamps)
+    .where(eq(jamps.chapterId, data.chapterId))
+    .orderBy(asc(jamps.displayOrder));
+  const maxOrder = existing.length > 0 ? Math.max(...existing.map(j => j.displayOrder)) : -1;
+
+  const newJamp: InsertJamp = {
+    id: randomUUID(),
+    chapterId: data.chapterId,
+    title: data.title,
+    type: data.type,
+    icon: data.icon || "📚",
+    description: data.description || null,
+    contentType: data.contentType || null,
+    contentUrl: data.contentUrl || null,
+    displayOrder: maxOrder + 1,
+    visible: true,
+  };
+
+  await db.insert(jamps).values(newJamp);
+  return newJamp as Jamp;
+}
+
+export async function updateJamp(data: {
+  id: string;
+  title?: string;
+  type?: "Méthode" | "Définition" | "Formule" | "Propriété" | "Astuce";
+  icon?: string;
+  description?: string;
+  contentType?: "image" | "video" | "pdf";
+  contentUrl?: string;
+  visible?: boolean;
+  displayOrder?: number;
+}): Promise<{ success: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { id, ...updates } = data;
+  await db.update(jamps).set(updates).where(eq(jamps.id, id));
+  return { success: true };
+}
+
+export async function deleteJamp(id: string): Promise<{ success: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(jamps).where(eq(jamps.id, id));
+  return { success: true };
+}
+
+// ========== Settings Functions (utilise la table stats pour stocker les settings) ==========
+
+export async function getSetting(key: string): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.select().from(stats).where(eq(stats.key, key)).limit(1);
+    if (result.length > 0) {
+      // La valeur est stockée comme un entier, mais on peut encoder des strings comme JSON
+      // Pour les classes actives, on stocke un bitmask ou on utilise une autre approche
+      return String(result[0].value);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getActiveClasses(): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return ["6A", "6B", "6C", "6D"]; // Par défaut toutes actives
+
+  try {
+    const result = await db.select().from(stats).where(eq(stats.key, "active_classes")).limit(1);
+    if (result.length > 0) {
+      // Stocké comme bitmask: 1=6A, 2=6B, 4=6C, 8=6D
+      const bitmask = result[0].value;
+      const classes: string[] = [];
+      if (bitmask & 1) classes.push("6A");
+      if (bitmask & 2) classes.push("6B");
+      if (bitmask & 4) classes.push("6C");
+      if (bitmask & 8) classes.push("6D");
+      return classes.length > 0 ? classes : ["6A", "6B", "6C", "6D"];
+    }
+    return ["6A", "6B", "6C", "6D"]; // Par défaut
+  } catch {
+    return ["6A", "6B", "6C", "6D"];
+  }
+}
+
+export async function setActiveClasses(classes: string[]): Promise<{ success: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Convertir en bitmask: 1=6A, 2=6B, 4=6C, 8=6D
+  let bitmask = 0;
+  if (classes.includes("6A")) bitmask |= 1;
+  if (classes.includes("6B")) bitmask |= 2;
+  if (classes.includes("6C")) bitmask |= 4;
+  if (classes.includes("6D")) bitmask |= 8;
+
+  try {
+    const existing = await db.select().from(stats).where(eq(stats.key, "active_classes")).limit(1);
+
+    if (existing.length === 0) {
+      const { randomUUID } = await import("crypto");
+      await db.insert(stats).values({
+        id: randomUUID(),
+        key: "active_classes",
+        value: bitmask,
+        updatedAt: new Date(),
+      });
+    } else {
+      await db.update(stats).set({ value: bitmask, updatedAt: new Date() }).where(eq(stats.key, "active_classes"));
+    }
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to set active classes:", error);
+    throw error;
+  }
+}
+
+// ========== Exercices cachés ==========
+
+export async function getHiddenExercices(): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db.select().from(hiddenExercices);
+    return result.map(r => r.id);
+  } catch {
+    return [];
+  }
+}
+
+export async function toggleExerciceVisibility(exerciceId: string): Promise<{ hidden: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    // Vérifier si l'exercice est déjà masqué
+    const existing = await db.select().from(hiddenExercices).where(eq(hiddenExercices.id, exerciceId)).limit(1);
+
+    if (existing.length > 0) {
+      // Il est masqué, on le rend visible (on supprime)
+      await db.delete(hiddenExercices).where(eq(hiddenExercices.id, exerciceId));
+      return { hidden: false };
+    } else {
+      // Il est visible, on le masque (on ajoute)
+      await db.insert(hiddenExercices).values({ id: exerciceId });
+      return { hidden: true };
+    }
+  } catch (error) {
+    console.error("[Database] Failed to toggle exercice visibility:", error);
+    throw error;
   }
 }
 
