@@ -808,7 +808,6 @@ async function buildSpiralAnimated() {
     // Utiliser les dimensions du viewBox (700x600) car canvas.width peut être NaN
     const svgWidth = canvas.width || 700;
     const svgHeight = canvas.height || 600;
-    console.log('DEBUG confettis:', { canvasWidth: canvas.width, canvasHeight: canvas.height, svgWidth, svgHeight });
 
     // Confettis - dispersés sur toute la largeur
     const confettiColors = ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6', '#e91e63'];
