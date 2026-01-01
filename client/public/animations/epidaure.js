@@ -195,8 +195,9 @@ function setupAnimationMode() {
 function applyZoom(scale, updateSlider = true) {
     if (!zoomGroup) return;
 
-    const svgWidth = canvas.width;
-    const svgHeight = canvas.height;
+    // Utiliser les dimensions du viewBox (750x600) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 750;
+    const svgHeight = canvas.height || 600;
 
     const cx = svgWidth / 2;
     // Centrer sur un point PLUS HAUT que O pour que O apparaisse en bas
@@ -780,8 +781,9 @@ async function buildEpidaureAnimated() {
 
     updateStepInfo('Theatre termine !', 'Zone inferieure : rayons espaces. Zone superieure : tous les rayons (double densite).');
 
-    // Confettis
-    const svgWidth = canvas.width;
+    // Confettis - dispersés sur toute la largeur
+    // Utiliser les dimensions du viewBox (750x600) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 750;
     const confettiColors = ['#e91e63', '#9c27b0', '#4caf50', '#ff9800', '#2196f3', '#f44336'];
     const confettis = [];
 
