@@ -543,8 +543,9 @@ async function buildEventailAnimated() {
 
     const zoomDuration = 1500;
     const targetScale = 1.3;
-    const svgWidth = canvas.width;
-    const svgHeight = canvas.height;
+    // Utiliser les dimensions du viewBox (700x550) car canvas.width peut être NaN
+    const svgWidth = canvas.width || 700;
+    const svgHeight = canvas.height || 550;
 
     // Point vers lequel zoomer (centre de l'éventail)
     const zoomToX = fanCenterX;
