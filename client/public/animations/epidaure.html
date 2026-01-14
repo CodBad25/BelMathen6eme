@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theatre d'Epidaure v12 - Construction a la regle et au compas</title>
+    <title>Theatre d'Epidaure v14 - Construction a la regle et au compas</title>
     <style>
         * {
             margin: 0;
@@ -17,58 +17,40 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 20px;
         }
         h1 {
             color: #eee;
-            margin-bottom: 5px;
-            font-size: 1.5em;
-            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8em;
         }
         .subtitle {
             color: #888;
-            margin-bottom: 15px;
-            font-size: 0.85em;
+            margin-bottom: 20px;
+            font-size: 0.9em;
             text-align: center;
-            padding: 0 10px;
         }
         .container {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
             justify-content: center;
-            width: 100%;
-            max-width: 1100px;
         }
         .canvas-container {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             overflow: hidden;
-            width: 100%;
-            max-width: 750px;
         }
         #canvas {
             display: block;
-            width: 100%;
-            height: auto;
         }
         .controls {
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
-            padding: 15px;
-            width: 100%;
+            padding: 20px;
+            min-width: 320px;
             max-width: 360px;
-        }
-
-        /* Mobile styles */
-        @media (max-width: 768px) {
-            body { padding: 10px 5px; }
-            h1 { font-size: 1.3em; }
-            .subtitle { font-size: 0.75em; margin-bottom: 10px; }
-            .container { flex-direction: column; align-items: center; }
-            .canvas-container { max-width: 100%; border-radius: 8px; }
-            .controls { max-width: 100%; padding: 12px; }
         }
         .mode-tabs {
             display: flex;
@@ -228,12 +210,12 @@
     </style>
 </head>
 <body>
-    <h1>Theatre d'Epidaure <span class="version-badge">v12</span></h1>
-    <p class="subtitle">Construction realiste : arcs longs puis gommage final</p>
+    <h1>Theatre d'Epidaure <span class="version-badge">v14 - 2026-01-14</span></h1>
+    <p class="subtitle">Report d'angle sur l'arc exterieur (corde plus grande, plus visible)</p>
 
     <div class="container">
         <div class="canvas-container">
-            <svg id="canvas" viewBox="0 0 750 600" preserveAspectRatio="xMidYMid meet"></svg>
+            <svg id="canvas" width="750" height="600"></svg>
         </div>
 
         <div class="controls">
@@ -279,12 +261,10 @@
             </div>
 
             <div class="principle">
-                <h4>Approche pedagogique v12</h4>
+                <h4>Principe v14</h4>
                 <p>
-                    <strong>1. Arcs longs</strong> : on trace tous les arcs avec l'etendue maximale (zone inf).<br><br>
-                    <strong>2. Rayons</strong> : on trace tous les rayons par report d'angle.<br><br>
-                    <strong>3. Gommage rayons</strong> : on efface la partie inferieure d'un rayon sur deux.<br><br>
-                    <strong>4. Gommage arcs</strong> : on raccourcit les arcs de la zone superieure.
+                    Le report d'angle se fait sur l'<strong>arc exterieur</strong> (grande corde, bien visible).<br><br>
+                    <strong>Meme rayon + meme corde = meme angle</strong>
                 </p>
             </div>
         </div>
