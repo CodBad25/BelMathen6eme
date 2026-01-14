@@ -892,11 +892,13 @@ function buildSteps() {
     });
 
     // Reports d'angle vers la gauche
+    let rayNumber = 3; // Rayon 1 = premier rayon (90°), Rayon 2 = angle de base
     for (let angle = 90 + 2 * CONFIG.baseAngle; angle <= maxAngle; angle += CONFIG.baseAngle) {
         const angleVal = angle;
+        const currentRayNum = rayNumber;
         steps.push({
-            title: `Report ${angleVal}°`,
-            description: `On reporte l'angle vers la gauche : ${angleVal}°`,
+            title: `Rayon ${currentRayNum}`,
+            description: `On reporte l'angle et on trace le rayon ${currentRayNum}.`,
             render: () => {
                 const startZ1 = pointOnCircle(O.x, O.y, CONFIG.orchestraRadius, angleVal);
                 const endZ1 = pointOnCircle(O.x, O.y, diazomaStart, angleVal);
@@ -906,14 +908,16 @@ function buildSteps() {
                 drawSegment(startZ2.x, startZ2.y, endZ2.x, endZ2.y, CONFIG.rayColor, 2);
             }
         });
+        rayNumber++;
     }
 
     // Reports d'angle vers la droite
     for (let angle = 90 - CONFIG.baseAngle; angle >= minAngle; angle -= CONFIG.baseAngle) {
         const angleVal = angle;
+        const currentRayNum = rayNumber;
         steps.push({
-            title: `Report ${angleVal}°`,
-            description: `On reporte l'angle vers la droite : ${angleVal}°`,
+            title: `Rayon ${currentRayNum}`,
+            description: `On reporte l'angle et on trace le rayon ${currentRayNum}.`,
             render: () => {
                 const startZ1 = pointOnCircle(O.x, O.y, CONFIG.orchestraRadius, angleVal);
                 const endZ1 = pointOnCircle(O.x, O.y, diazomaStart, angleVal);
@@ -923,6 +927,7 @@ function buildSteps() {
                 drawSegment(startZ2.x, startZ2.y, endZ2.x, endZ2.y, CONFIG.rayColor, 2);
             }
         });
+        rayNumber++;
     }
 
     // Gommage rayons
