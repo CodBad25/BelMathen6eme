@@ -584,9 +584,31 @@ async function buildEpidaureAnimated() {
     await canvas.wait(400);
 
     // ÉTAPE 14 : Gommage des arcs
+    // On dessine d'ABORD les nouveaux arcs courts, PUIS on efface les anciens
+    // Ainsi les arcs extérieurs ne disparaissent jamais complètement
     updateStepInfo('Gommage des arcs', 'On raccourcit les arcs de la zone superieure.');
     await canvas.wait(400);
 
+    canvas.compas.setPosition(O.x, O.y, -90);
+    canvas.compas.show();
+
+    // Dessiner les nouveaux arcs courts EN PREMIER
+    canvas.compas.setEcart(CONFIG.borderRadius);
+    await canvas.wait(100);
+    await drawer.drawArc('arcBorderShort', O.x, O.y, CONFIG.borderRadius, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
+
+    canvas.compas.setEcart(outerRadius);
+    await canvas.wait(100);
+    await drawer.drawArc('arcOuterShort', O.x, O.y, outerRadius, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
+
+    canvas.compas.setEcart(zone2Start);
+    await canvas.wait(100);
+    await drawer.drawArc('arcZone2Start', O.x, O.y, zone2Start, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
+
+    canvas.compas.hide();
+
+    // MAINTENANT effacer les anciens arcs longs (les nouveaux sont déjà visibles)
+    await canvas.wait(200);
     const arcsToTrim = ['arcBorder', 'arcOuter', 'arcDiazomaEnd'];
     for (const arcId of arcsToTrim) {
         const arc = canvas.objects[arcId];
@@ -604,23 +626,7 @@ async function buildEpidaureAnimated() {
         }
     }
 
-    canvas.compas.setPosition(O.x, O.y, -90);
-    canvas.compas.show();
-
-    canvas.compas.setEcart(CONFIG.borderRadius);
-    await canvas.wait(100);
-    await drawer.drawArc('arcBorderShort', O.x, O.y, CONFIG.borderRadius, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
-
-    canvas.compas.setEcart(outerRadius);
-    await canvas.wait(100);
-    await drawer.drawArc('arcOuterShort', O.x, O.y, outerRadius, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
-
-    canvas.compas.setEcart(zone2Start);
-    await canvas.wait(100);
-    await drawer.drawArc('arcZone2Start', O.x, O.y, zone2Start, minAngleZ2, maxAngleZ2, CONFIG.mainArcColor, 3, 300);
-
-    canvas.compas.hide();
-    await canvas.wait(400);
+    await canvas.wait(200);
 
     // ÉTAPE 15 : Rangées zone supérieure
     updateStepInfo('Rangees zone superieure', 'On trace les arcs des rangees de la zone superieure.');
