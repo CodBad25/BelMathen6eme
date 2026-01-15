@@ -41,6 +41,9 @@ const ZOOM_START = 2.0;  // Zoom au début (très rapproché pour voir les déta
 const ZOOM_END = 0.75;   // Zoom à la fin (recul pour voir l'ensemble)
 let autoZoomEnabled = true;  // Le zoom automatique est-il actif ?
 
+// Boucle
+let loopEnabled = false;
+
 // Données calculées
 let O, chordLength;
 let arcPoints = [];      // Points sur l'arc (pour le report d'angle)
@@ -118,6 +121,7 @@ function initModeAnimation() {
     document.getElementById('btnPlay').addEventListener('click', startAnimation);
     document.getElementById('btnPause').addEventListener('click', togglePauseAnimation);
     document.getElementById('btnReset').addEventListener('click', resetAnimation);
+    document.getElementById('btnLoop').addEventListener('click', toggleLoop);
 
     document.getElementById('speedSlider').addEventListener('input', (e) => {
         const speed = parseFloat(e.target.value);
@@ -256,6 +260,13 @@ async function startAnimation() {
     isAnimating = false;
     document.getElementById('btnPlay').textContent = '▶ Lancer l\'animation';
     document.getElementById('btnPlay').classList.remove('playing');
+
+    // Si la boucle est activée, relancer l'animation après un délai
+    if (loopEnabled) {
+        await canvas.wait(2000);
+        resetAnimation();
+        startAnimation();
+    }
 }
 
 function togglePauseAnimation() {
@@ -290,6 +301,20 @@ function resetAnimation() {
     document.getElementById('btnPlay').classList.remove('playing');
     document.getElementById('btnPause').textContent = '⏸ Pause';
     updateStepInfo('Prêt', 'Cliquez sur "Lancer l\'animation" pour voir la construction de la spirale d\'Archimède.');
+}
+
+function toggleLoop() {
+    loopEnabled = !loopEnabled;
+    const btn = document.getElementById('btnLoop');
+    if (loopEnabled) {
+        btn.textContent = 'Boucle : ON';
+        btn.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+        btn.style.borderColor = '#27ae60';
+    } else {
+        btn.textContent = 'Boucle : OFF';
+        btn.style.background = 'rgba(255,255,255,0.1)';
+        btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    }
 }
 
 // ============================================
