@@ -165,6 +165,35 @@ export default function SectionPage() {
               const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
               const isExercices = resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice");
 
+              // Affichage différent pour les exercices (carte compacte) vs les PDFs (avec miniature)
+              if (isExercices) {
+                return (
+                  <Card
+                    key={resource.id}
+                    className="hover:shadow-md transition-all cursor-pointer relative"
+                    onClick={() => openResource(resource)}
+                  >
+                    {showCorrectionButton && (
+                      <button
+                        className="absolute top-1 right-1 w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalPdf({ id: correction.id, url: correction.url, title: correction.title });
+                        }}
+                      >
+                        C
+                      </button>
+                    )}
+                    <CardContent className="p-4 flex flex-col items-center text-center">
+                      <span className="text-4xl mb-2">{resource.icon || "📄"}</span>
+                      <h3 className="text-sm font-semibold leading-tight line-clamp-2">
+                        {resource.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
               return (
                 <Card key={resource.id} className="hover:shadow-lg transition-all relative overflow-hidden">
                   {showCorrectionButton && (
@@ -176,7 +205,7 @@ export default function SectionPage() {
                     </button>
                   )}
                   <CardContent className="p-0">
-                    {isPdf && !isExercices ? (
+                    {isPdf ? (
                       <div
                         className="w-full aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden cursor-pointer"
                         onClick={() => openResource(resource)}
@@ -195,7 +224,7 @@ export default function SectionPage() {
                       <h3 className="text-sm font-semibold leading-tight line-clamp-2 text-center mb-2">
                         {resource.title}
                       </h3>
-                      {isPdf && !isExercices && (
+                      {isPdf && (
                         <div className="flex gap-2 justify-center">
                           <Button size="sm" variant="default" className="flex-1 h-8 text-xs" onClick={() => openResource(resource)}>
                             <Eye className="w-3 h-3 mr-1" />
@@ -206,11 +235,6 @@ export default function SectionPage() {
                             Ouvrir
                           </Button>
                         </div>
-                      )}
-                      {isExercices && (
-                        <Button size="sm" variant="default" className="w-full h-8 text-xs" onClick={() => openResource(resource)}>
-                          Voir les exercices
-                        </Button>
                       )}
                     </div>
                   </CardContent>
