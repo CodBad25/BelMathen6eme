@@ -1,10 +1,19 @@
+import { useState } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, Download } from "lucide-react";
 import { useFilteredResources } from "@/hooks/useFilteredResources";
 import { useClasse } from "@/contexts/ClasseContext";
+import { PdfThumbnail } from "@/components/PdfThumbnail";
+import { PdfViewer } from "@/components/PdfViewer";
+
+interface OpenPdf {
+  id: string;
+  url: string;
+  title: string;
+}
 
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
   "chapitre-1-angles": { name: "Les Angles", icon: "📐", color: "from-indigo-500 to-blue-600" },
@@ -64,19 +73,27 @@ export default function SectionPage() {
   const { resources, allResources, isLoading } = useFilteredResources();
   const { classe, isClasseView } = useClasse();
   const [, navigate] = useLocation();
+  const [modalPdf, setModalPdf] = useState<OpenPdf | null>(null);
 
   // Préfixe pour les liens selon la classe
   const linkPrefix = isClasseView ? `/${classe}` : "";
 
-  const openResource = (resource: { type: string; url: string; title: string }) => {
+  const openResource = (resource: { id: string; type: string; url: string; title: string }) => {
     // Si c'est la carte "Exercices", naviguer vers la page interactive
     if (resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice")) {
       navigate(`${linkPrefix}/grandeur/${chapterId}/${sectionId}/exercices`);
       return;
     }
-    // Ouvrir directement dans un nouvel onglet - le navigateur gère l'affichage et l'impression
-    window.open(resource.url, '_blank');
+    // Ouvrir le viewer PDF
+    const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
+    if (isPdf) {
+      setModalPdf({ id: resource.id, url: resource.url, title: resource.title });
+    } else {
+      window.open(resource.url, '_blank');
+    }
   };
+
+  const downloadResource = (url: string) => window.open(url, '_blank');
 
   const grandeur = chapterId ? grandeurs[chapterId] : null;
   const section = (chapterId && sectionId) ? sectionsByChapter[chapterId]?.[sectionId] : null;
@@ -90,9 +107,9 @@ export default function SectionPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-32 w-full" />
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-24 w-full" />
+          <div className="grid grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-48 w-full" />
             ))}
           </div>
         </div>
@@ -114,35 +131,30 @@ export default function SectionPage() {
   }
 
   return (
-    <div className="h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col overflow-hidden">
-      <header className={`bg-gradient-to-r ${section.color} text-white py-[2vh] md:py-6 px-4 shadow-lg`}>
-        <div className="max-w-4xl mx-auto">
-          <p className="text-[2vw] md:text-sm opacity-75 text-center">Réalisé avec ❤️ par M.BELHAJ</p>
-          <div className="flex items-center gap-[2vw] md:gap-3">
-            <Link href={`${linkPrefix}/grandeur/${chapterId}`}>
-              <Button variant="secondary" size="sm" className="flex-shrink-0 h-[8vw] w-[8vw] md:h-auto md:w-auto p-0 md:px-3">
-                <ArrowLeft className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
-                <span className="hidden md:inline md:ml-1">Retour</span>
-              </Button>
-            </Link>
-            <div className="flex items-center gap-[2vw]">
-              <span className="text-[8vw] md:text-4xl">{section.icon}</span>
-              <div>
-                <h1 className="text-[5vw] md:text-2xl font-bold">{section.name}</h1>
-                <p className="text-[3vw] md:text-base opacity-90">{grandeur.icon} {grandeur.name}</p>
-              </div>
-            </div>
+    <div className="min-h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col">
+      <header className={`bg-gradient-to-r ${section.color} text-white py-3 px-4 shadow-lg sticky top-0 z-10`}>
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <Link href={`${linkPrefix}/grandeur/${chapterId}`}>
+            <Button variant="secondary" size="sm" className="h-8 px-3">
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden md:inline ml-1">Retour</span>
+            </Button>
+          </Link>
+          <span className="text-2xl">{section.icon}</span>
+          <div>
+            <h1 className="text-xl font-bold">{section.name}</h1>
+            <p className="text-sm opacity-90">{grandeur.icon} {grandeur.name}</p>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto p-[2vw] md:p-6 w-full flex flex-col">
+      <main className="flex-1 max-w-4xl mx-auto p-4 w-full">
         {sectionResources.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-lg text-gray-500">Aucune ressource disponible.</p>
           </div>
         ) : (
-          <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-[1.5vw] md:gap-3 content-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sectionResources.map((resource) => {
               // Trouver la correction associée si elle existe (dans toutes les ressources)
               const correction = resource.correctionId
@@ -150,36 +162,57 @@ export default function SectionPage() {
                 : null;
               // Afficher le bouton C seulement si la correction est visible
               const showCorrectionButton = correction && correction.visible === "true";
+              const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
+              const isExercices = resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice");
 
               return (
-                <Card
-                  key={resource.id}
-                  className="hover:shadow-md transition-all cursor-pointer relative"
-                  onClick={() => openResource(resource)}
-                >
-                  {/* Bouton Correction */}
+                <Card key={resource.id} className="hover:shadow-lg transition-all relative overflow-hidden">
                   {showCorrectionButton && (
                     <button
-                      className="absolute top-1 right-1 md:top-2 md:right-2 w-[5vw] h-[5vw] md:w-6 md:h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-[2.5vw] md:text-xs font-bold shadow-md transition-colors z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(correction.url, '_blank');
-                      }}
-                      title="Voir la correction"
+                      className="absolute top-1 right-1 w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md z-10"
+                      onClick={() => setModalPdf({ id: correction.id, url: correction.url, title: correction.title })}
                     >
                       C
                     </button>
                   )}
-                  <CardContent className="p-[2vw] md:p-3 flex flex-col items-center text-center">
-                    <span className="text-[5vw] md:text-2xl mb-1">{resource.icon || "📄"}</span>
-                    <h3 className="text-[3vw] md:text-sm font-semibold leading-tight line-clamp-1">
-                      {resource.title}
-                    </h3>
-                    {resource.description && (
-                      <p className="text-[2.5vw] md:text-xs text-gray-600 leading-tight line-clamp-2">
-                        {resource.description}
-                      </p>
+                  <CardContent className="p-0">
+                    {isPdf && !isExercices ? (
+                      <div
+                        className="w-full aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden cursor-pointer"
+                        onClick={() => openResource(resource)}
+                      >
+                        <PdfThumbnail url={resource.url} width={400} className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div
+                        className="w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center cursor-pointer"
+                        onClick={() => openResource(resource)}
+                      >
+                        <span className="text-6xl">{resource.icon || "📄"}</span>
+                      </div>
                     )}
+                    <div className="p-3 border-t bg-white">
+                      <h3 className="text-sm font-semibold leading-tight line-clamp-2 text-center mb-2">
+                        {resource.title}
+                      </h3>
+                      {isPdf && !isExercices && (
+                        <div className="flex gap-2 justify-center">
+                          <Button size="sm" variant="default" className="flex-1 h-8 text-xs" onClick={() => openResource(resource)}>
+                            <Eye className="w-3 h-3 mr-1" />
+                            Aperçu
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={() => downloadResource(resource.url)}>
+                            <Download className="w-3 h-3 mr-1" />
+                            Ouvrir
+                          </Button>
+                        </div>
+                      )}
+                      {isExercices && (
+                        <Button size="sm" variant="default" className="w-full h-8 text-xs" onClick={() => openResource(resource)}>
+                          Voir les exercices
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -188,9 +221,22 @@ export default function SectionPage() {
         )}
       </main>
 
-      <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm">
+      <footer className="bg-gray-100 border-t py-2 text-center text-gray-600 text-sm">
         <p>Mathématiques 6e - Collège Gaston Chaissac</p>
       </footer>
+
+      {/* Modal PDF */}
+      {modalPdf && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-4xl h-[85vh]">
+            <PdfViewer
+              url={modalPdf.url}
+              title={modalPdf.title}
+              onClose={() => setModalPdf(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
