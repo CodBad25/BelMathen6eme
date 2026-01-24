@@ -165,17 +165,17 @@ export default function SectionPage() {
               const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
               const isExercices = resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice");
 
-              // Affichage ancien style pour les exercices (carte compacte comme avant)
+              // Carte exercices : même hauteur que les PDFs, contenu centré
               if (isExercices) {
                 return (
                   <Card
                     key={resource.id}
-                    className="hover:shadow-md transition-all cursor-pointer relative"
+                    className="hover:shadow-md transition-all cursor-pointer relative h-full"
                     onClick={() => openResource(resource)}
                   >
                     {showCorrectionButton && (
                       <button
-                        className="absolute top-1 right-1 md:top-2 md:right-2 w-[5vw] h-[5vw] md:w-6 md:h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-[2.5vw] md:text-xs font-bold shadow-md transition-colors z-10"
+                        className="absolute top-1 right-1 md:top-2 md:right-2 w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-colors z-10"
                         onClick={(e) => {
                           e.stopPropagation();
                           setModalPdf({ id: correction.id, url: correction.url, title: correction.title });
@@ -184,9 +184,9 @@ export default function SectionPage() {
                         C
                       </button>
                     )}
-                    <CardContent className="p-[2vw] md:p-3 flex flex-col items-center text-center">
-                      <span className="text-[5vw] md:text-2xl mb-1">{resource.icon || "📄"}</span>
-                      <h3 className="text-[3vw] md:text-sm font-semibold leading-tight line-clamp-1">
+                    <CardContent className="p-6 h-full flex flex-col items-center justify-center text-center">
+                      <span className="text-5xl mb-3">{resource.icon || "📄"}</span>
+                      <h3 className="text-base font-semibold leading-tight">
                         {resource.title}
                       </h3>
                     </CardContent>
