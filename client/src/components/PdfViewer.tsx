@@ -77,16 +77,17 @@ export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
       const containerWidth = container.clientWidth - 32; // padding
       const containerHeight = container.clientHeight - 32;
 
-      // Calculer le ratio pour fit width et fit height
-      const scaleWidth = containerWidth / viewport.width;
-      const scaleHeight = containerHeight / viewport.height;
+      // Le canvas sera rendu avec RENDER_SCALE
+      const canvasWidth = viewport.width * RENDER_SCALE;
+      const canvasHeight = viewport.height * RENDER_SCALE;
 
-      // Prendre le plus petit pour que tout rentre
-      const optimalScale = Math.min(scaleWidth, scaleHeight);
-      const optimalZoom = Math.floor(optimalScale * 100 / RENDER_SCALE);
+      // Calculer le zoom CSS pour que le canvas rentre dans le conteneur
+      const scaleWidth = containerWidth / canvasWidth;
+      const scaleHeight = containerHeight / canvasHeight;
+      const optimalZoom = Math.floor(Math.min(scaleWidth, scaleHeight) * 100);
 
       // Appliquer le zoom optimal seulement au premier chargement
-      if (baseZoom === 100 && optimalZoom < 100) {
+      if (baseZoom === 100) {
         setBaseZoom(optimalZoom);
         setZoom(optimalZoom);
       }

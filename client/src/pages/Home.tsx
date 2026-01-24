@@ -62,6 +62,85 @@ const citations = [
   { text: "Les mathématiques ne mentent jamais.", author: "Pythagore" },
 ];
 
+// Couleurs par chapitre
+const chapterColors: Record<string, string> = {
+  "chapitre-1-angles": "from-indigo-400 to-blue-500",
+  "chapitre-2-prix": "from-green-400 to-emerald-500",
+  "chapitre-3-aires": "from-teal-400 to-cyan-500",
+  "chapitre-4-durees": "from-orange-400 to-amber-500",
+  "chapitre-5-volumes": "from-purple-400 to-violet-500",
+};
+
+// Composant Nouveautés avec badge et popup
+function NouveautesPopover({
+  resources,
+  linkPrefix,
+  chapterNames,
+  sectionNames,
+}: {
+  resources: any[];
+  linkPrefix: string;
+  chapterNames: Record<string, string>;
+  sectionNames: Record<string, string>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return "";
+    const d = new Date(date);
+    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  };
+
+  return (
+    <div className="mt-8 flex justify-center">
+      <div className="relative">
+        {/* Badge cliquable */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-full px-4 py-2 shadow-sm transition-all hover:shadow-md"
+        >
+          <span className="text-sm font-medium text-gray-700">Nouveautés</span>
+          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+            {resources.length}
+          </span>
+        </button>
+
+        {/* Popup avec détails */}
+        {isOpen && (
+          <>
+            {/* Overlay pour fermer */}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+            {/* Contenu popup - grille compacte */}
+            <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-lg shadow-xl border border-gray-200 w-[600px] max-w-[95vw]">
+              <div className="p-2 border-b bg-gray-50 rounded-t-lg flex justify-between items-center">
+                <h4 className="font-semibold text-gray-800 text-sm">Nouveautés cette semaine</h4>
+                <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              <div className="p-2 grid grid-cols-4 gap-1.5 max-h-48 overflow-auto">
+                {resources.map((resource) => (
+                  <Link
+                    key={resource.id}
+                    href={`${linkPrefix}/grandeur/${resource.chapterId}/${resource.sectionId}`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <div className={`bg-gradient-to-br ${chapterColors[resource.chapterId] || "from-gray-400 to-gray-500"} rounded p-1.5 cursor-pointer hover:opacity-90 transition-opacity`}>
+                      <p className="text-[10px] font-medium text-white truncate">{resource.title}</p>
+                      <p className="text-[9px] text-white/70">{formatDate((resource as any).updatedAt ?? resource.createdAt)}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [visibleCards, setVisibleCards] = useState<number[]>([]);
   const [citation] = useState(() => citations[Math.floor(Math.random() * citations.length)]);
@@ -93,118 +172,83 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col overflow-hidden">
-      <header className="bg-gradient-to-r from-blue-400 to-purple-400 text-white py-[3vh] md:py-8 px-4 shadow-lg">
-        <div className="max-w-7xl mx-auto text-center space-y-[0.5vh] md:space-y-2">
-          <p className="text-[2.5vw] md:text-base opacity-80">Réalisé avec <span className="inline-block animate-pulse text-[3vw] md:text-lg">❤️</span> par M.BELHAJ</p>
-          <h1 className="text-[8vw] md:text-5xl font-bold">
+    <div className="min-h-dvh bg-gradient-to-br from-purple-50 to-blue-50 flex flex-col">
+      <header className="bg-gradient-to-r from-blue-400 to-purple-400 text-white py-6 md:py-8 px-4 shadow-lg">
+        <div className="max-w-4xl mx-auto text-center space-y-1">
+          <p className="text-sm opacity-80">Réalisé avec <span className="inline-block animate-pulse">❤️</span> par M.BELHAJ</p>
+          <h1 className="text-3xl md:text-5xl font-bold">
             Mathématiques 6e{isClasseView && ` - ${classe}`}
           </h1>
-          <p className="text-[3.5vw] md:text-xl opacity-90">Collège Gaston Chaissac - {getSchoolYear()}</p>
+          <p className="text-base md:text-xl opacity-90">Collège Gaston Chaissac - {getSchoolYear()}</p>
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto p-[2vw] md:p-6 w-full flex flex-col">
-        <div className="text-center mb-[1vh] md:mb-4">
-          <h2 className="text-[5vw] md:text-3xl font-bold text-gray-800">Les Grandeurs</h2>
-          {/* Citation célèbre */}
-          <div className="mt-1">
-            <p className="text-[2.5vw] md:text-sm text-purple-600 italic">"{citation.text}"</p>
-            <p className="text-[2vw] md:text-xs text-gray-500">— {citation.author}</p>
-          </div>
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Les Grandeurs</h2>
+          <p className="text-sm text-purple-600 italic mt-2">"{citation.text}"</p>
+          <p className="text-xs text-gray-500">— {citation.author}</p>
         </div>
 
-        <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 gap-[1.5vw] md:gap-4 content-center">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 md:gap-4 max-w-3xl mx-auto">
           {grandeurs.map((grandeur, index) => (
             <Link key={grandeur.id} href={`${linkPrefix}/grandeur/${grandeur.id}`}>
-              <div
-                className={`group cursor-pointer transition-all duration-500 h-[22vw] md:h-36
+              <Card
+                className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg
                   ${visibleCards.includes(index)
-                    ? "opacity-100 translate-y-0 scale-100"
-                    : "opacity-0 translate-y-8 scale-95"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-4"
                   }`}
-                style={{
-                  transitionDelay: `${index * 50}ms`,
-                  perspective: "1000px"
-                }}
+                style={{ transitionDelay: `${index * 50}ms` }}
               >
-                <div
-                  className="relative w-full h-full transition-transform duration-500 group-hover:[transform:rotateY(180deg)]"
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  {/* Face avant */}
-                  <Card className="absolute inset-0 overflow-hidden [backface-visibility:hidden]">
-                    <div className={`bg-gradient-to-br ${grandeur.color} h-[14vw] md:h-24 flex items-center justify-center`}>
-                      {grandeur.icon === "aire" ? (
-                        <AireIcon className="w-[11vw] h-[11vw] md:w-16 md:h-16 text-white" />
-                      ) : grandeur.icon === "angle" ? (
-                        <AngleIcon className="w-[11vw] h-[11vw] md:w-16 md:h-16 text-white" />
-                      ) : (
-                        <span className="text-[11vw] md:text-6xl leading-none">{grandeur.icon}</span>
-                      )}
-                    </div>
-                    <CardContent className="p-[1.5vw] md:p-3 text-center">
-                      <h3 className="font-semibold text-[2.8vw] md:text-base text-gray-800 leading-tight">
-                        {grandeur.name}
-                      </h3>
-                    </CardContent>
-                  </Card>
-                  {/* Face arrière */}
-                  <Card
-                    className={`absolute inset-0 overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br ${grandeur.color} flex items-center justify-center`}
-                  >
-                    <CardContent className="p-[2vw] md:p-4 text-center text-white">
-                      <span className="text-[6vw] md:text-3xl mb-2 block">👆</span>
-                      <p className="font-bold text-[3vw] md:text-sm">Clique pour explorer !</p>
-                    </CardContent>
-                  </Card>
+                <div className={`bg-gradient-to-br ${grandeur.color} h-16 md:h-20 flex items-center justify-center`}>
+                  {grandeur.icon === "aire" ? (
+                    <AireIcon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                  ) : grandeur.icon === "angle" ? (
+                    <AngleIcon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                  ) : (
+                    <span className="text-3xl md:text-4xl">{grandeur.icon}</span>
+                  )}
                 </div>
-              </div>
+                <CardContent className="p-2 text-center">
+                  <h3 className="font-semibold text-xs md:text-sm text-gray-800">
+                    {grandeur.name}
+                  </h3>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>
 
-        {/* Section Nouveautés - style compact */}
+        {/* Notification Nouveautés */}
         {recentResources && recentResources.length > 0 && (
-          <div className="mt-[1.5vh] md:mt-4 text-center">
-            <p className="text-[2.5vw] md:text-sm text-purple-600 mb-[0.5vh] md:mb-2">
-              <span className="animate-pulse">✨</span> Nouveautés
-            </p>
-            <div className="flex flex-wrap justify-center gap-[1vw] md:gap-1.5">
-              {recentResources.slice(0, 6).map((resource) => (
-                <Link
-                  key={resource.id}
-                  href={`${linkPrefix}/grandeur/${resource.chapterId}/${resource.sectionId}`}
-                >
-                  <span className="inline-block bg-purple-100 hover:bg-purple-200 text-purple-700 text-[2vw] md:text-xs px-[1.5vw] md:px-2 py-[0.5vw] md:py-1 rounded-full cursor-pointer transition-colors">
-                    {resource.title}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <NouveautesPopover
+            resources={recentResources}
+            linkPrefix={linkPrefix}
+            chapterNames={chapterNames}
+            sectionNames={sectionNames}
+          />
         )}
 
-        <div className="mt-[1vh] md:mt-4 text-center space-y-1">
+        <div className="mt-6 text-center space-y-2">
           <Link href={`${linkPrefix}/cours`}>
-            <span className="text-[3vw] md:text-base text-purple-600 hover:text-purple-800 font-medium underline cursor-pointer">
+            <span className="text-sm text-purple-600 hover:text-purple-800 font-medium underline cursor-pointer">
               Voir tous les chapitres
             </span>
           </Link>
-          {/* Compteur de visites */}
           {visitData && visitData.count > 0 && (
-            <p className="text-[2vw] md:text-xs text-gray-400">
+            <p className="text-xs text-gray-400">
               {visitData.count} visite{visitData.count > 1 ? "s" : ""} sur cette page
             </p>
           )}
         </div>
       </main>
 
-      <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm relative">
+      <footer className="bg-gray-100 border-t py-3 text-center text-gray-600 text-sm relative">
         <p>Mathématiques 6e{isClasseView && ` - ${classe}`} - Collège Gaston Chaissac</p>
         {!isClasseView && (
           <Link href="/admin">
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 cursor-pointer text-[3vw] md:text-base">
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 cursor-pointer">
               🔒
             </span>
           </Link>

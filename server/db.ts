@@ -114,7 +114,7 @@ export async function getRecentResources(days: number = 7): Promise<Resource[]> 
       const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
       return dateB - dateA; // Most recent first
     })
-    .slice(0, 10); // Max 10 recent items
+    ; // All recent items from last N days
 }
 
 export async function updateResourceVisibility(id: string, visible: "true" | "false"): Promise<void> {
