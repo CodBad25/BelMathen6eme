@@ -31,6 +31,7 @@ const resources = pgTable("resources", {
   order: integer("order").notNull(),
   displayOrder: integer("displayOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
   correctionId: varchar("correctionId", { length: 64 }),
 });
 
@@ -126,7 +127,7 @@ const appRouter = t.router({
         }
         const db = getDb();
         await db.update(resources)
-          .set({ visible: input.visible })
+          .set({ visible: input.visible, updatedAt: new Date() })
           .where(eq(resources.id, input.id));
         return { success: true };
       }),
@@ -140,7 +141,7 @@ const appRouter = t.router({
         }
         const db = getDb();
         await db.update(resources)
-          .set({ visible: input.visible })
+          .set({ visible: input.visible, updatedAt: new Date() })
           .where(eq(resources.chapterId, input.chapterId));
         return { success: true };
       }),
@@ -157,11 +158,11 @@ const appRouter = t.router({
           throw new Error("Unauthorized");
         }
         const db = getDb();
-        const fieldMap: Record<string, Record<string, string>> = {
-          "6A": { visible6A: input.visible },
-          "6B": { visible6B: input.visible },
-          "6C": { visible6C: input.visible },
-          "6D": { visible6D: input.visible },
+        const fieldMap: Record<string, Record<string, string | Date>> = {
+          "6A": { visible6A: input.visible, updatedAt: new Date() },
+          "6B": { visible6B: input.visible, updatedAt: new Date() },
+          "6C": { visible6C: input.visible, updatedAt: new Date() },
+          "6D": { visible6D: input.visible, updatedAt: new Date() },
         };
         await db.update(resources)
           .set(fieldMap[input.classe])
@@ -250,7 +251,7 @@ const appRouter = t.router({
         const db = getDb();
         const { id, ...updates } = input;
         await db.update(resources)
-          .set(updates)
+          .set({ ...updates, updatedAt: new Date() })
           .where(eq(resources.id, id));
         return { success: true };
       }),
@@ -264,7 +265,7 @@ const appRouter = t.router({
         }
         const db = getDb();
         await db.update(resources)
-          .set({ chapterId: input.chapterId })
+          .set({ chapterId: input.chapterId, updatedAt: new Date() })
           .where(eq(resources.id, input.id));
         return { success: true };
       }),
@@ -300,7 +301,7 @@ const appRouter = t.router({
         }
         const db = getDb();
         await db.update(resources)
-          .set({ correctionId: input.correctionId })
+          .set({ correctionId: input.correctionId, updatedAt: new Date() })
           .where(eq(resources.id, input.id));
         return { success: true };
       }),
@@ -316,7 +317,7 @@ const appRouter = t.router({
         return corrections.filter(c => c.chapterId === input.chapterId);
       }),
 
-    // Get recent resources (last 7 days, visible only)
+    // Get recent resources (last 7 days, visible only) - based on updatedAt
     getRecent: publicProcedure
       .input(z.object({ days: z.number().default(7) }).optional())
       .query(async ({ input }) => {
@@ -328,12 +329,12 @@ const appRouter = t.router({
         const allResources = await db.select().from(resources)
           .where(eq(resources.visible, "true"));
 
-        // Filter by createdAt in JS (Neon doesn't support all date comparisons easily)
+        // Filter by updatedAt (when resource was last modified/added)
         return allResources
-          .filter(r => r.createdAt && new Date(r.createdAt) >= cutoffDate)
+          .filter(r => r.updatedAt && new Date(r.updatedAt) >= cutoffDate)
           .sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+            const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
             return dateB - dateA; // Most recent first
           })
           .slice(0, 10); // Max 10 recent items

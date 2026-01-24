@@ -106,12 +106,12 @@ export async function getRecentResources(days: number = 7): Promise<Resource[]> 
 
   const allResources = await db.select().from(resources);
 
-  // Filter visible resources created within the last N days
+  // Filter visible resources updated within the last N days
   return allResources
-    .filter(r => r.visible === "true" && r.createdAt && new Date(r.createdAt) >= cutoffDate)
+    .filter(r => r.visible === "true" && r.updatedAt && new Date(r.updatedAt) >= cutoffDate)
     .sort((a, b) => {
-      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
       return dateB - dateA; // Most recent first
     })
     .slice(0, 10); // Max 10 recent items

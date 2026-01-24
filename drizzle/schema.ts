@@ -42,6 +42,7 @@ export const resources = pgTable("resources", {
   order: integer("order").notNull(),
   displayOrder: integer("displayOrder").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
   // Lien vers la correction associée (nullable)
   correctionId: varchar("correctionId", { length: 64 }),
 });

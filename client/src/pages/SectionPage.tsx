@@ -15,12 +15,12 @@ interface OpenPdf {
   title: string;
 }
 
-// Helper pour vérifier si une ressource est nouvelle (derniers 7 jours)
-const isNewResource = (createdAt: Date | null | undefined): boolean => {
-  if (!createdAt) return false;
+// Helper pour vérifier si une ressource est nouvelle (derniers 7 jours basé sur updatedAt)
+const isNewResource = (updatedAt: Date | null | undefined): boolean => {
+  if (!updatedAt) return false;
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 7);
-  return new Date(createdAt) >= cutoffDate;
+  return new Date(updatedAt) >= cutoffDate;
 };
 
 // Badge "NEW" component
@@ -179,7 +179,7 @@ export default function SectionPage() {
               const showCorrectionButton = correction && correction.visible === "true";
               const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
               const isExercices = resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice");
-              const isNew = isNewResource(resource.createdAt);
+              const isNew = isNewResource((resource as any).updatedAt ?? resource.createdAt);
 
               // Carte exercices : même hauteur que les PDFs, contenu centré
               if (isExercices) {
