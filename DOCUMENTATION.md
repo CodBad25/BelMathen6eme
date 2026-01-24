@@ -4,7 +4,7 @@
 
 **URL de production** : https://belmathen6eme.vercel.app
 **Repo GitHub** : https://github.com/CodBad25/BelMathen6eme
-**Dernière mise à jour** : 1er décembre 2025
+**Dernière mise à jour** : 14 janvier 2026
 
 ---
 
@@ -208,6 +208,49 @@ git add -A && git commit -m "message" && git push origin master
 - Étude n°3 - Mesurer un volume
 - Étude n°4 - Calculer un volume
 - Activités Rapides
+
+---
+
+## Problemes Connus
+
+### Ecran de chargement lent (Cold Start)
+
+**Symptome** : Sur certaines pages (notamment ExercicesPage), un ecran "Chargement..." avec spinner vert s'affiche pendant plusieurs secondes.
+
+**Pages concernees** :
+- `ExercicesPage.tsx` - attend 2 requetes API avant affichage
+
+**Cause racine** : Architecture serverless (Vercel + Neon PostgreSQL)
+
+```
+Sequence lors d'un cold start :
+1. Vercel reveille la fonction serverless (~500ms)
+2. Dynamic import charge le module DB
+3. Neon etablit la connexion PostgreSQL (~1-2s a froid)
+4. La requete SQL s'execute
+5. La reponse revient au client
+```
+
+**Code responsable** (`server/routers.ts`) :
+```typescript
+exercices: router({
+  getHidden: publicProcedure.query(async () => {
+    const { getHiddenExercices } = await import("./db");  // Cold start ici
+    return { hidden: await getHiddenExercices() };
+  }),
+}),
+```
+
+**Requetes bloquantes** (`client/src/pages/ExercicesPage.tsx`) :
+```typescript
+const { data: user, isLoading: userLoading } = trpc.auth.me.useQuery();
+const { data: hiddenData, isLoading: hiddenLoading } = trpc.exercices.getHidden.useQuery();
+const isLoading = userLoading || hiddenLoading;  // Bloque l'affichage
+```
+
+**Solution definitive** : Migrer vers un hebergement avec serveur persistant (pas serverless) et PostgreSQL local avec pool de connexions. Le cold start disparaitra.
+
+**Date diagnostic** : 14 janvier 2026
 
 ---
 

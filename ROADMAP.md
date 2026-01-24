@@ -72,6 +72,35 @@ npx tsx scripts/seed-resources.ts
 
 ## Fonctionnalités futures
 
+### 0. Optimiser le chargement des animations (Priorité moyenne)
+
+**Problème :** Les pages d'animations (spirale, éventail, épidaure) affichent un écran blanc pendant plusieurs secondes sur tous les appareils.
+
+**Cause :** Le JS (~65K total) doit être téléchargé et exécuté avant l'affichage.
+
+**Solutions possibles :**
+
+1. **Ajouter un spinner de chargement** (Recommandé)
+   - Ajouter un loader CSS visible immédiatement dans le HTML
+   - Le masquer une fois le JS initialisé
+   - Donne l'impression d'un chargement plus rapide
+
+2. **Minifier les fichiers JS**
+   - Utiliser terser ou uglify pour compresser (~30% de gain)
+   - Script npm pour minifier avant déploiement
+
+3. **Lazy loading des instruments**
+   - Ne charger les classes Regle/Compas/Crayon qu'au moment de l'animation
+   - Réduire le temps d'initialisation
+
+**Fichiers concernés :**
+- `client/public/animations/spirale.html` (et .js)
+- `client/public/animations/eventail.html` (et .js)
+- `client/public/animations/epidaure.html` (et .js)
+- `client/public/animations/geometrie.js` (moteur commun)
+
+---
+
 ### 1. Bouton Correction intégré (Priorité haute)
 **Description :** Afficher un bouton "C" sur chaque ressource qui possède une correction associée.
 

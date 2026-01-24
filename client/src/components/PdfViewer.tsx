@@ -17,10 +17,12 @@ const RENDER_SCALE = 1.5;
 
 export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [zoom, setZoom] = useState(100);
+  const [baseZoom, setBaseZoom] = useState(100); // Zoom calculé pour "fit"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -56,9 +58,9 @@ export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
     return () => { cancelled = true; };
   }, [url]);
 
-  // Rendre la page courante
+  // Rendre la page courante et calculer le zoom optimal
   useEffect(() => {
-    if (!pdf || !canvasRef.current) return;
+    if (!pdf || !canvasRef.current || !containerRef.current) return;
 
     let cancelled = false;
 
@@ -68,20 +70,40 @@ export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
 
       const canvas = canvasRef.current!;
       const context = canvas.getContext("2d")!;
+      const container = containerRef.current!;
 
-      const viewport = page.getViewport({ scale: RENDER_SCALE });
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      // Calculer le zoom optimal pour que la page rentre dans le conteneur
+      const viewport = page.getViewport({ scale: 1 });
+      const containerWidth = container.clientWidth - 32; // padding
+      const containerHeight = container.clientHeight - 32;
+
+      // Calculer le ratio pour fit width et fit height
+      const scaleWidth = containerWidth / viewport.width;
+      const scaleHeight = containerHeight / viewport.height;
+
+      // Prendre le plus petit pour que tout rentre
+      const optimalScale = Math.min(scaleWidth, scaleHeight);
+      const optimalZoom = Math.floor(optimalScale * 100 / RENDER_SCALE);
+
+      // Appliquer le zoom optimal seulement au premier chargement
+      if (baseZoom === 100 && optimalZoom < 100) {
+        setBaseZoom(optimalZoom);
+        setZoom(optimalZoom);
+      }
+
+      const renderViewport = page.getViewport({ scale: RENDER_SCALE });
+      canvas.width = renderViewport.width;
+      canvas.height = renderViewport.height;
 
       await page.render({
         canvasContext: context,
-        viewport,
+        viewport: renderViewport,
       }).promise;
     }
 
     renderPage();
     return () => { cancelled = true; };
-  }, [pdf, currentPage]);
+  }, [pdf, currentPage, baseZoom]);
 
   const handleDownload = () => {
     window.open(url, "_blank");
@@ -125,7 +147,13 @@ export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
           <Button variant="outline" size="sm" onClick={zoomOut} className="h-7 w-7 p-0">
             <ZoomOut className="w-4 h-4" />
           </Button>
-          <span className="text-xs min-w-[40px] text-center">{zoom}%</span>
+          <button
+            onClick={() => setZoom(baseZoom)}
+            className="text-xs min-w-[40px] text-center hover:bg-gray-200 rounded px-1"
+            title="Réinitialiser le zoom"
+          >
+            {zoom}%
+          </button>
           <Button variant="outline" size="sm" onClick={zoomIn} className="h-7 w-7 p-0">
             <ZoomIn className="w-4 h-4" />
           </Button>
@@ -133,7 +161,7 @@ export function PdfViewer({ url, title, onClose }: PdfViewerProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto bg-gray-200 p-2">
+      <div ref={containerRef} className="flex-1 overflow-auto bg-gray-200 p-2">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
