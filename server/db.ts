@@ -97,6 +97,26 @@ export async function getAllResources(): Promise<Resource[]> {
   return db.select().from(resources);
 }
 
+export async function getRecentResources(days: number = 7): Promise<Resource[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+
+  const allResources = await db.select().from(resources);
+
+  // Filter visible resources created within the last N days
+  return allResources
+    .filter(r => r.visible === "true" && r.createdAt && new Date(r.createdAt) >= cutoffDate)
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // Most recent first
+    })
+    .slice(0, 10); // Max 10 recent items
+}
+
 export async function updateResourceVisibility(id: string, visible: "true" | "false"): Promise<void> {
   const db = await getDb();
   if (!db) return;

@@ -97,6 +97,12 @@ export const appRouter = router({
       const { getAllResources } = await import("./db");
       return getAllResources();
     }),
+    getRecent: publicProcedure
+      .input(z.object({ days: z.number().default(7) }).optional())
+      .query(async ({ input }) => {
+        const { getRecentResources } = await import("./db");
+        return getRecentResources(input?.days ?? 7);
+      }),
     toggleClassVisibility: protectedProcedure
       .input(z.object({
         id: z.string(),

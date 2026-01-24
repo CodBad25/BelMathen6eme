@@ -15,6 +15,21 @@ interface OpenPdf {
   title: string;
 }
 
+// Helper pour vérifier si une ressource est nouvelle (derniers 7 jours)
+const isNewResource = (createdAt: Date | null | undefined): boolean => {
+  if (!createdAt) return false;
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 7);
+  return new Date(createdAt) >= cutoffDate;
+};
+
+// Badge "NEW" component
+const NewBadge = () => (
+  <span className="absolute top-1 left-1 md:top-2 md:left-2 bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded text-xs font-bold shadow-md z-10 animate-pulse">
+    NEW
+  </span>
+);
+
 const grandeurs: Record<string, { name: string; icon: string; color: string }> = {
   "chapitre-1-angles": { name: "Les Angles", icon: "📐", color: "from-indigo-500 to-blue-600" },
   "chapitre-2-prix": { name: "Les Prix", icon: "💶", color: "from-green-500 to-emerald-600" },
@@ -164,6 +179,7 @@ export default function SectionPage() {
               const showCorrectionButton = correction && correction.visible === "true";
               const isPdf = resource.type === "pdf" || resource.url.toLowerCase().endsWith(".pdf");
               const isExercices = resource.title.toLowerCase().includes("exercices") || resource.title.toLowerCase().includes("exercice");
+              const isNew = isNewResource(resource.createdAt);
 
               // Carte exercices : même hauteur que les PDFs, contenu centré
               if (isExercices) {
@@ -173,6 +189,7 @@ export default function SectionPage() {
                     className="hover:shadow-md transition-all cursor-pointer relative h-full"
                     onClick={() => openResource(resource)}
                   >
+                    {isNew && <NewBadge />}
                     {showCorrectionButton && (
                       <button
                         className="absolute top-1 right-1 md:top-2 md:right-2 w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md transition-colors z-10"
@@ -196,6 +213,7 @@ export default function SectionPage() {
 
               return (
                 <Card key={resource.id} className="hover:shadow-lg transition-all relative overflow-hidden">
+                  {isNew && <NewBadge />}
                   {showCorrectionButton && (
                     <button
                       className="absolute top-1 right-1 w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md z-10"

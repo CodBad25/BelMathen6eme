@@ -34,6 +34,24 @@ const grandeurs = [
   { id: "chapitre-5-volumes", name: "Les Volumes", icon: "📦", color: "from-purple-400 to-violet-500" },
 ];
 
+const chapterNames: Record<string, string> = {
+  "chapitre-1-angles": "Les Angles",
+  "chapitre-2-prix": "Les Prix",
+  "chapitre-3-aires": "Les Aires",
+  "chapitre-4-durees": "Les Durées",
+  "chapitre-5-volumes": "Les Volumes",
+};
+
+const sectionNames: Record<string, string> = {
+  "introduction": "Introduction",
+  "cours": "Cours",
+  "etude-1": "Étude n°1",
+  "etude-2": "Étude n°2",
+  "etude-3": "Étude n°3",
+  "etude-4": "Étude n°4",
+  "activite-rapide": "Activités Rapides",
+};
+
 // Citations célèbres sur les mathématiques
 const citations = [
   { text: "Les mathématiques sont la poésie de la logique.", author: "Albert Einstein" },
@@ -55,6 +73,9 @@ export default function Home() {
   // Compteur de visites côté serveur
   const { data: visitData } = trpc.stats.getVisitCount.useQuery();
   const incrementMutation = trpc.stats.incrementVisitCount.useMutation();
+
+  // Ressources récentes (nouveautés)
+  const { data: recentResources } = trpc.resources.getRecent.useQuery();
 
   useEffect(() => {
     // Animation cascade : chaque carte apparaît avec un délai
@@ -142,6 +163,37 @@ export default function Home() {
             </Link>
           ))}
         </div>
+
+        {/* Section Nouveautés */}
+        {recentResources && recentResources.length > 0 && (
+          <div className="mt-[2vh] md:mt-6 bg-white/70 rounded-xl p-[2vw] md:p-4 shadow-sm">
+            <h3 className="text-[4vw] md:text-lg font-bold text-purple-700 mb-[1vh] md:mb-3 flex items-center gap-2">
+              <span className="animate-pulse">✨</span> Nouveautés
+            </h3>
+            <div className="flex flex-wrap gap-[1.5vw] md:gap-2">
+              {recentResources.map((resource) => (
+                <Link
+                  key={resource.id}
+                  href={`${linkPrefix}/grandeur/${resource.chapterId}/${resource.sectionId}`}
+                >
+                  <div className="bg-gradient-to-r from-purple-100 to-blue-100 hover:from-purple-200 hover:to-blue-200 rounded-lg px-[2vw] py-[1vw] md:px-3 md:py-2 cursor-pointer transition-all hover:scale-105 border border-purple-200">
+                    <div className="flex items-center gap-[1vw] md:gap-2">
+                      <span className="text-[3vw] md:text-base bg-yellow-400 text-yellow-900 px-[1vw] md:px-1.5 py-[0.3vw] md:py-0.5 rounded text-[2vw] md:text-xs font-bold">
+                        NEW
+                      </span>
+                      <span className="text-[2.5vw] md:text-sm font-medium text-gray-700">
+                        {resource.title}
+                      </span>
+                    </div>
+                    <p className="text-[2vw] md:text-xs text-gray-500 mt-[0.5vw] md:mt-1">
+                      {chapterNames[resource.chapterId]} → {sectionNames[resource.sectionId] || resource.sectionId}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-[1vh] md:mt-4 text-center space-y-1">
           <Link href={`${linkPrefix}/cours`}>

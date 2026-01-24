@@ -315,6 +315,29 @@ const appRouter = t.router({
         // Filter by chapter if provided
         return corrections.filter(c => c.chapterId === input.chapterId);
       }),
+
+    // Get recent resources (last 7 days, visible only)
+    getRecent: publicProcedure
+      .input(z.object({ days: z.number().default(7) }).optional())
+      .query(async ({ input }) => {
+        const db = getDb();
+        const days = input?.days ?? 7;
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+
+        const allResources = await db.select().from(resources)
+          .where(eq(resources.visible, "true"));
+
+        // Filter by createdAt in JS (Neon doesn't support all date comparisons easily)
+        return allResources
+          .filter(r => r.createdAt && new Date(r.createdAt) >= cutoffDate)
+          .sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA; // Most recent first
+          })
+          .slice(0, 10); // Max 10 recent items
+      }),
   }),
 });
 
