@@ -164,31 +164,21 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Section Nouveautés */}
+        {/* Section Nouveautés - style compact */}
         {recentResources && recentResources.length > 0 && (
-          <div className="mt-[2vh] md:mt-6 bg-white/70 rounded-xl p-[2vw] md:p-4 shadow-sm">
-            <h3 className="text-[4vw] md:text-lg font-bold text-purple-700 mb-[1vh] md:mb-3 flex items-center gap-2">
+          <div className="mt-[1.5vh] md:mt-4 text-center">
+            <p className="text-[2.5vw] md:text-sm text-purple-600 mb-[0.5vh] md:mb-2">
               <span className="animate-pulse">✨</span> Nouveautés
-            </h3>
-            <div className="flex flex-wrap gap-[1.5vw] md:gap-2">
-              {recentResources.map((resource) => (
+            </p>
+            <div className="flex flex-wrap justify-center gap-[1vw] md:gap-1.5">
+              {recentResources.slice(0, 6).map((resource) => (
                 <Link
                   key={resource.id}
                   href={`${linkPrefix}/grandeur/${resource.chapterId}/${resource.sectionId}`}
                 >
-                  <div className="bg-gradient-to-r from-purple-100 to-blue-100 hover:from-purple-200 hover:to-blue-200 rounded-lg px-[2vw] py-[1vw] md:px-3 md:py-2 cursor-pointer transition-all hover:scale-105 border border-purple-200">
-                    <div className="flex items-center gap-[1vw] md:gap-2">
-                      <span className="text-[3vw] md:text-base bg-yellow-400 text-yellow-900 px-[1vw] md:px-1.5 py-[0.3vw] md:py-0.5 rounded text-[2vw] md:text-xs font-bold">
-                        NEW
-                      </span>
-                      <span className="text-[2.5vw] md:text-sm font-medium text-gray-700">
-                        {resource.title}
-                      </span>
-                    </div>
-                    <p className="text-[2vw] md:text-xs text-gray-500 mt-[0.5vw] md:mt-1">
-                      {chapterNames[resource.chapterId]} → {sectionNames[resource.sectionId] || resource.sectionId}
-                    </p>
-                  </div>
+                  <span className="inline-block bg-purple-100 hover:bg-purple-200 text-purple-700 text-[2vw] md:text-xs px-[1.5vw] md:px-2 py-[0.5vw] md:py-1 rounded-full cursor-pointer transition-colors">
+                    {resource.title}
+                  </span>
                 </Link>
               ))}
             </div>
