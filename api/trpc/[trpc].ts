@@ -13,6 +13,13 @@ import { pgTable, text, varchar, integer, timestamp, pgEnum } from "drizzle-orm/
 const typeEnum = pgEnum("type", ["pdf", "video", "link"]);
 const visibleEnum = pgEnum("visible", ["true", "false"]);
 
+const stats = pgTable("stats", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  key: varchar("key", { length: 64 }).notNull().unique(),
+  value: integer("value").notNull().default(0),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
 const resources = pgTable("resources", {
   id: varchar("id", { length: 64 }).primaryKey(),
   chapterId: varchar("chapterId", { length: 64 }).notNull(),
@@ -339,6 +346,45 @@ const appRouter = t.router({
           })
           ; // All recent items from last N days
       }),
+  }),
+
+  stats: t.router({
+    getVisitCount: publicProcedure.query(async () => {
+      const db = getDb();
+      try {
+        const result = await db.select().from(stats).where(eq(stats.key, "visit_count")).limit(1);
+        return { count: result.length > 0 ? result[0].value : 0 };
+      } catch {
+        return { count: 0 };
+      }
+    }),
+
+    incrementVisitCount: publicProcedure.mutation(async () => {
+      const db = getDb();
+      try {
+        const existing = await db.select().from(stats).where(eq(stats.key, "visit_count")).limit(1);
+
+        if (existing.length === 0) {
+          const id = `stats-${Date.now()}`;
+          await db.insert(stats).values({
+            id,
+            key: "visit_count",
+            value: 1,
+            updatedAt: new Date(),
+          });
+          return { count: 1 };
+        } else {
+          const newValue = existing[0].value + 1;
+          await db.update(stats)
+            .set({ value: newValue, updatedAt: new Date() })
+            .where(eq(stats.key, "visit_count"));
+          return { count: newValue };
+        }
+      } catch (error) {
+        console.error("Failed to increment visit count:", error);
+        return { count: 0 };
+      }
+    }),
   }),
 });
 

@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, FileText, CheckCircle, BookOpen, X, Lock, Play, Image, FileDown, Bot, Gamepad2 } from "lucide-react";
 import { useState } from "react";
 import InteractiveExercise from "@/components/InteractiveExercise";
+import InteractiveExercise2 from "@/components/InteractiveExercise2";
 
 // Types de JAMP et leurs couleurs
 type JampType = "Méthode" | "Définition" | "Formule" | "Propriété" | "Astuce";
@@ -20,6 +21,7 @@ const jampTypeColors: Record<JampType, { bg: string; hover: string; text: string
 const jampTypes: Record<string, JampType> = {
   "jamp-comparer-decimaux": "Méthode",
   "jamp-calculer-difference": "Méthode",
+  "jamp-ecrire-nombre-lettres": "Méthode",
 };
 
 // Structure détaillée des exercices avec les vrais énoncés
@@ -34,6 +36,7 @@ const exercicesDetail: Record<string, {
     enonce: React.ReactNode;
     correctionImages?: string[];
     correctionText?: string;
+    correctionContent?: React.ReactNode;
     jampId?: string;
     iaResources?: {
       video?: string;
@@ -118,6 +121,23 @@ const exercicesDetail: Record<string, {
         enonce: (
           <p>Jean m'a avancé de l'argent, il me fait un chèque sur lequel est écrit <strong>« quatre-vingt-dix euros et cinq centimes »</strong>. Écris en chiffre la somme que je lui dois.</p>
         ),
+        correctionContent: (
+          <div className="space-y-4">
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r">
+              <p className="text-lg font-bold text-green-800">Réponse : <span className="text-2xl">90,05 €</span></p>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="font-semibold text-blue-800 mb-2">💡 Décomposition :</p>
+              <ul className="space-y-1 text-blue-700">
+                <li>• <span className="bg-yellow-200 px-1 rounded">quatre-vingt</span> = 4 × 20 = <strong>80</strong></li>
+                <li>• <span className="bg-yellow-200 px-1 rounded">dix</span> = <strong>10</strong></li>
+                <li>• quatre-vingt-dix = 80 + 10 = <strong>90 €</strong></li>
+                <li>• <span className="bg-pink-200 px-1 rounded">cinq centimes</span> = <strong>0,05 €</strong></li>
+              </ul>
+            </div>
+          </div>
+        ),
+        jampId: "jamp-ecrire-nombre-lettres",
       },
       {
         id: "b",
@@ -125,6 +145,26 @@ const exercicesDetail: Record<string, {
         enonce: (
           <p>Sur un acte notarié, il est écrit <strong>« la maison a été vendue pour la somme de trois cent soixante-dix mille sept cent soixante-trois euros et dix-sept centimes »</strong>. Quelle somme doit figurer en chiffre sur le chèque ?</p>
         ),
+        correctionContent: (
+          <div className="space-y-4">
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r">
+              <p className="text-lg font-bold text-green-800">Réponse : <span className="text-2xl">370 763,17 €</span></p>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="font-semibold text-blue-800 mb-2">💡 Décomposition :</p>
+              <ul className="space-y-2 text-blue-700">
+                <li>• <span className="bg-yellow-200 px-1 rounded">trois cent soixante-dix mille</span> = 370 × 1000 = <strong>370 000</strong></li>
+                <li>• <span className="bg-orange-200 px-1 rounded">sept cent soixante-trois</span> = 700 + 63 = <strong>763</strong></li>
+                <li>• Total euros : 370 000 + 763 = <strong>370 763 €</strong></li>
+                <li>• <span className="bg-pink-200 px-1 rounded">dix-sept centimes</span> = <strong>0,17 €</strong></li>
+              </ul>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+              <p className="text-amber-800 text-sm">⚠️ <strong>Attention</strong> : "trois cent" ne prend pas de "s" car il est suivi de "soixante-dix"</p>
+            </div>
+          </div>
+        ),
+        jampId: "jamp-ecrire-nombre-lettres",
       },
       {
         id: "c",
@@ -132,6 +172,36 @@ const exercicesDetail: Record<string, {
         enonce: (
           <p>Écris en toutes lettres les prix suivants : <strong>1300 € ; 2583 € ; 780 €</strong></p>
         ),
+        correctionContent: (
+          <div className="space-y-4">
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r space-y-3">
+              <div>
+                <p className="text-gray-600 text-sm">1300 € =</p>
+                <p className="text-lg font-bold text-green-800">mille-trois-cents euros</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">2583 € =</p>
+                <p className="text-lg font-bold text-green-800">deux-mille-cinq-cent-quatre-vingt-trois euros</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">780 € =</p>
+                <p className="text-lg font-bold text-green-800">sept-cent-quatre-vingts euros</p>
+              </div>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="font-semibold text-blue-800 mb-2">💡 Points importants :</p>
+              <ul className="space-y-2 text-blue-700 text-sm">
+                <li>• <strong>1300</strong> : "trois-cent<span className="bg-green-200 px-1 rounded font-bold">s</span>" prend un <strong>s</strong> car multiplié (3×100) et en fin de nombre</li>
+                <li>• <strong>2583</strong> : "cinq-cent" <span className="bg-red-200 px-1 rounded">sans s</span> car suivi de "quatre-vingt-trois"</li>
+                <li>• <strong>780</strong> : "quatre-vingt<span className="bg-green-200 px-1 rounded font-bold">s</span>" prend un <strong>s</strong> car multiplié (4×20) et en fin de nombre</li>
+              </ul>
+            </div>
+            <div className="bg-violet-50 border border-violet-200 p-3 rounded-lg">
+              <p className="text-violet-800 text-sm">📝 <strong>Rappel</strong> : Depuis 1990, on met des traits d'union entre <u>tous</u> les mots d'un nombre.</p>
+            </div>
+          </div>
+        ),
+        jampId: "jamp-ecrire-nombre-lettres",
       }
     ]
   },
@@ -279,13 +349,17 @@ const exercicesDetail: Record<string, {
 };
 
 // État de visibilité (simulé - en vrai ce serait en base de données)
-// Pour l'instant on simule : seules les corrections de ex1 sont visibles
 const visibilityState: Record<string, Record<string, { correction: boolean; jamp: boolean }>> = {
   "ex1": {
     "a": { correction: true, jamp: true },
     "b": { correction: true, jamp: true },
     "c": { correction: true, jamp: false },
     "d": { correction: true, jamp: false },
+  },
+  "ex2": {
+    "a": { correction: true, jamp: true },
+    "b": { correction: true, jamp: true },
+    "c": { correction: true, jamp: true },
   }
 };
 
@@ -426,7 +500,7 @@ export default function ExerciceDetailPage() {
   };
 
   const hasCorrection = (question: typeof exercice.questions[0]) => {
-    return question.correctionImages || question.correctionText;
+    return question.correctionImages || question.correctionText || question.correctionContent;
   };
 
   return (
@@ -556,7 +630,12 @@ export default function ExerciceDetailPage() {
 
             {/* Contenu du modal */}
             <div className="flex-1 overflow-auto p-[4vw] md:p-6">
-              {modal.question.correctionText && (
+              {modal.question.correctionContent && (
+                <div className="text-[3.5vw] md:text-base">
+                  {modal.question.correctionContent}
+                </div>
+              )}
+              {modal.question.correctionText && !modal.question.correctionContent && (
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-[3.5vw] md:text-base whitespace-pre-line">
                     {modal.question.correctionText}
@@ -593,10 +672,13 @@ export default function ExerciceDetailPage() {
       {showInteractive && exerciceId === "ex1" && (
         <InteractiveExercise onClose={() => setShowInteractive(false)} />
       )}
+      {showInteractive && exerciceId === "ex2" && (
+        <InteractiveExercise2 onClose={() => setShowInteractive(false)} />
+      )}
 
       <footer className="bg-gray-100 border-t py-[1vh] md:py-3 text-center text-gray-600 text-[2.5vw] md:text-sm flex items-center justify-center gap-[3vw] md:gap-4">
         <p>Mathématiques 6e - Collège Gaston Chaissac</p>
-        {exerciceId === "ex1" && (
+        {(exerciceId === "ex1" || exerciceId === "ex2") && (
           <Button
             onClick={() => setShowInteractive(true)}
             size="sm"

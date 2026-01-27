@@ -68,8 +68,91 @@ export default function JampDetailPage() {
 
   const jampType = jamp.type as JampType;
 
+  // Contenu spécifique pour certains JAMP (hardcodé)
+  const specialJampContent: Record<string, React.ReactNode> = {
+    "jamp-ecrire-nombre-lettres": (
+      <div className="w-full max-w-2xl mx-auto space-y-6 text-[3.5vw] md:text-base">
+        <div className="bg-violet-50 border-2 border-violet-300 rounded-xl p-4 md:p-6">
+          <h3 className="text-violet-800 font-bold text-lg md:text-xl mb-4 flex items-center gap-2">
+            <span className="text-2xl">📝</span> Règles d'écriture des nombres
+          </h3>
+
+          {/* Règle 1 */}
+          <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              <h4 className="font-bold text-blue-800">Trait d'union partout</h4>
+            </div>
+            <p className="text-gray-700 mb-2">Depuis 1990, on met un <span className="bg-yellow-200 px-1 rounded font-semibold">trait d'union</span> entre TOUS les mots d'un nombre.</p>
+            <div className="bg-blue-50 p-2 rounded text-blue-800">
+              ✓ <span className="font-mono">vingt-et-un</span>, <span className="font-mono">deux-cent-cinquante-six</span>, <span className="font-mono">trois-mille-quatre-cent-vingt-sept</span>
+            </div>
+          </div>
+
+          {/* Règle 2 */}
+          <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              <h4 className="font-bold text-green-800">Quand utiliser "et" ?</h4>
+            </div>
+            <p className="text-gray-700 mb-2">On utilise <span className="bg-green-200 px-1 rounded font-semibold">"et"</span> uniquement pour :</p>
+            <div className="bg-green-50 p-2 rounded text-green-800 mb-2">
+              ✓ 21, 31, 41, 51, 61, 71 → <span className="font-mono">vingt-et-un</span>, <span className="font-mono">soixante-et-onze</span>
+            </div>
+            <div className="bg-red-50 p-2 rounded text-red-800">
+              ✗ PAS pour 81, 91 → <span className="font-mono">quatre-vingt-un</span>, <span className="font-mono">quatre-vingt-onze</span>
+            </div>
+          </div>
+
+          {/* Règle 3 */}
+          <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <h4 className="font-bold text-orange-800">Accord de "vingt" et "cent"</h4>
+            </div>
+            <p className="text-gray-700 mb-2">Ils prennent un <span className="bg-orange-200 px-1 rounded font-bold">s</span> quand ils sont <strong>multipliés</strong> ET <strong>en fin de nombre</strong>.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="bg-green-50 p-2 rounded text-green-800">
+                ✓ <span className="font-mono">quatre-vingt<span className="text-green-600 font-bold">s</span></span> (80)<br/>
+                ✓ <span className="font-mono">deux-cent<span className="text-green-600 font-bold">s</span></span> (200)
+              </div>
+              <div className="bg-red-50 p-2 rounded text-red-800">
+                ✗ <span className="font-mono">quatre-vingt-trois</span> (83)<br/>
+                ✗ <span className="font-mono">deux-cent-cinq</span> (205)
+              </div>
+            </div>
+          </div>
+
+          {/* Règle 4 */}
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">4</span>
+              <h4 className="font-bold text-purple-800">"Mille" est invariable</h4>
+            </div>
+            <p className="text-gray-700 mb-2"><span className="bg-purple-200 px-1 rounded font-semibold">"Mille"</span> ne prend JAMAIS de "s".</p>
+            <div className="bg-purple-50 p-2 rounded text-purple-800">
+              ✓ <span className="font-mono">deux-mille</span>, <span className="font-mono">trois-mille-cinq-cents</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Astuce finale */}
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4">
+          <p className="text-amber-800 font-medium">
+            💡 <strong>Astuce</strong> : Pour les centimes, on écrit "euro<strong>s</strong>" et "centime<strong>s</strong>" au pluriel !
+          </p>
+        </div>
+      </div>
+    ),
+  };
+
   // Render content based on type
   const renderContent = () => {
+    // Vérifier si c'est un JAMP avec contenu spécial hardcodé
+    if (jampId && specialJampContent[jampId]) {
+      return specialJampContent[jampId];
+    }
+
     if (!jamp.contentUrl) {
       return (
         <div className="text-center py-12">
