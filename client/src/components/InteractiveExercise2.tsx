@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, XCircle, Trophy, Gamepad2, RefreshCw, Shuffle, ArrowLeft, Target } from "lucide-react";
+import { CheckCircle, XCircle, Trophy, Gamepad2, RefreshCw, Shuffle, ArrowLeft, Target, Timer, Camera, Share2 } from "lucide-react";
+import html2canvas from "html2canvas";
 
 // Types
 interface Question {
@@ -407,6 +408,15 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
   const [showEndScreen, setShowEndScreen] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
+  // Chronomètre
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0); // en secondes
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Ref pour la capture d'écran
+  const resultCardRef = useRef<HTMLDivElement>(null);
+
   // Refs pour les inputs
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -418,10 +428,88 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
   // Vérifier si toutes les questions sont répondues
   useEffect(() => {
     if (hasStarted && answeredQuestions.length === totalQuestions && totalQuestions > 0) {
+      // Arrêter le chronomètre
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        setIsTimerRunning(false);
+      }
       // Délai de 2.5 secondes pour voir le feedback de la dernière question
       setTimeout(() => setShowEndScreen(true), 2500);
     }
   }, [answeredQuestions.length, totalQuestions, hasStarted]);
+
+  // Gestion du chronomètre
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerRunning]);
+
+  // Formater le temps
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Fonction pour capturer l'écran de résultat
+  const captureResult = async () => {
+    if (!resultCardRef.current) {
+      console.error("resultCardRef is null");
+      return;
+    }
+
+    try {
+      // Capturer avec html2canvas
+      const canvas = await html2canvas(resultCardRef.current, {
+        backgroundColor: "#1e293b",
+        scale: 2,
+        useCORS: true,
+        logging: true, // Activer les logs pour debug
+      });
+
+      // Convertir en blob et télécharger
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.download = `defi-maths-${new Date().toLocaleDateString("fr-FR").replace(/\//g, "-")}.png`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+      }, "image/png");
+    } catch (error) {
+      console.error("Erreur html2canvas:", error);
+      // Fallback : copier le texte si html2canvas échoue
+      const text = `🏆 Défi Maths - Écrire les nombres en lettres\n✅ Score: ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)${timerEnabled ? `\n⏱️ Temps: ${formatTime(elapsedTime)}` : ""}\n📅 ${new Date().toLocaleDateString("fr-FR")}`;
+      await navigator.clipboard.writeText(text);
+      alert("Capture impossible sur ce navigateur. Résultat copié dans le presse-papier !");
+    }
+  };
+
+  // Partager le résultat (si Web Share API disponible)
+  const shareResult = async () => {
+    const text = `🏆 Défi Maths - Écrire les nombres en lettres\n✅ Score: ${score}/${totalQuestions} (${Math.round((score / totalQuestions) * 100)}%)${timerEnabled ? `\n⏱️ Temps: ${formatTime(elapsedTime)}` : ""}\n📅 ${new Date().toLocaleDateString("fr-FR")}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {
+        // Annulé par l'utilisateur
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      alert("Résultat copié dans le presse-papier !");
+    }
+  };
 
   // Focus automatique sur l'input de la question courante
   useEffect(() => {
@@ -456,6 +544,12 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
     setResults({});
     setShowHints({});
     setShowEndScreen(false);
+
+    // Démarrer le chronomètre si activé
+    if (timerEnabled) {
+      setElapsedTime(0);
+      setIsTimerRunning(true);
+    }
   };
 
   const handleSubmit = (questionId: string) => {
@@ -493,6 +587,12 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
     setResults({});
     setShowHints({});
     setShowEndScreen(false);
+
+    // Redémarrer le chronomètre si activé
+    if (timerEnabled) {
+      setElapsedTime(0);
+      setIsTimerRunning(true);
+    }
   };
 
   const goToSectionChoice = () => {
@@ -503,6 +603,13 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
     setResults({});
     setShowHints({});
     setShowEndScreen(false);
+
+    // Arrêter et réinitialiser le chronomètre
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setIsTimerRunning(false);
+    setElapsedTime(0);
   };
 
   // Écran de choix de section
@@ -561,15 +668,34 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
               })}
             </div>
 
-            {/* Bouton commencer */}
+            {/* Option chronomètre */}
             <div className="mt-[4vw] md:mt-6 pt-[3vw] md:pt-4 border-t border-gray-200">
+              <label className="flex items-center gap-[2vw] md:gap-3 p-[3vw] md:p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={timerEnabled}
+                  onChange={(e) => setTimerEnabled(e.target.checked)}
+                  className="w-[5vw] h-[5vw] md:w-5 md:h-5 accent-purple-500"
+                />
+                <div className="flex items-center gap-[2vw] md:gap-2 flex-1">
+                  <Timer className="w-[5vw] h-[5vw] md:w-5 md:h-5 text-purple-600" />
+                  <div>
+                    <p className="text-[3.5vw] md:text-sm font-medium text-gray-800">Mode Défi</p>
+                    <p className="text-[2.5vw] md:text-xs text-gray-500">Activer le chronomètre pour te surpasser</p>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {/* Bouton commencer */}
+            <div className="mt-[3vw] md:mt-4">
               <Button
                 onClick={startExercise}
                 disabled={!selectedSection}
                 className="w-full gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-[4vw] md:text-base py-[3vw] md:py-3"
               >
                 <Gamepad2 className="w-[5vw] h-[5vw] md:w-5 md:h-5" />
-                Commencer !
+                {timerEnabled ? "Lancer le défi !" : "Commencer !"}
               </Button>
 
               <Button variant="ghost" onClick={onClose} className="w-full mt-[2vw] md:mt-2 text-gray-500">
@@ -598,24 +724,57 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-green-800 to-emerald-900 z-50 overflow-y-auto p-[2vw] md:p-4">
         <Card className="max-w-lg mx-auto my-[5vh] md:my-10">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-[4vw] md:p-4 text-center">
-            <h3 className="text-[3.5vw] md:text-base font-bold">
-              {sections.find((s) => s.id === selectedSection)?.title}
-            </h3>
+          {/* Carte de résultat capturale */}
+          <div ref={resultCardRef} className="bg-slate-800 rounded-t-lg">
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-[4vw] md:p-4 text-center rounded-t-lg">
+              <h3 className="text-[3.5vw] md:text-base font-bold">
+                🎯 Défi Maths - {sections.find((s) => s.id === selectedSection)?.title}
+              </h3>
+            </div>
+
+            <div className="p-[6vw] md:p-8 text-center bg-slate-800 text-white">
+              <div className="text-[15vw] md:text-8xl mb-[2vh] md:mb-3">{emoji}</div>
+              <h2 className="text-[6vw] md:text-2xl font-bold mb-[2vh] md:mb-3">
+                {percentage >= 80 ? "Excellent !" : percentage >= 60 ? "Bien joué !" : percentage >= 40 ? "Continue !" : "Révise !"}
+              </h2>
+              <p className="text-[4vw] md:text-lg text-gray-300 mb-[1vh] md:mb-2">
+                Score : <span className="font-bold text-purple-400">{score}/{totalQuestions}</span> ({percentage}%)
+              </p>
+              {timerEnabled && (
+                <div className="flex items-center justify-center gap-[2vw] md:gap-2 text-[4vw] md:text-lg mb-[2vh] md:mb-3">
+                  <Timer className="w-[5vw] h-[5vw] md:w-5 md:h-5 text-amber-400" />
+                  <span className="font-mono font-bold text-amber-400">{formatTime(elapsedTime)}</span>
+                </div>
+              )}
+              <p className="text-[2.5vw] md:text-xs text-gray-400">
+                📅 {new Date().toLocaleDateString("fr-FR")}
+              </p>
+            </div>
           </div>
 
-          <CardContent className="p-[6vw] md:p-8 text-center">
-            <div className="text-[15vw] md:text-8xl mb-[3vh] md:mb-4">{emoji}</div>
-            <h2 className="text-[6vw] md:text-2xl font-bold mb-[2vh] md:mb-3">
-              {percentage >= 80 ? "Excellent !" : percentage >= 60 ? "Bien joué !" : percentage >= 40 ? "Continue !" : "Révise !"}
-            </h2>
-            <p className="text-[4vw] md:text-lg text-gray-600 mb-[1vh] md:mb-2">
-              Tu as obtenu <span className="font-bold text-purple-600">{score}/{totalQuestions}</span> bonnes réponses
-            </p>
-            <p className="text-[5vw] md:text-xl font-bold text-purple-600 mb-[2vh] md:mb-4">
-              {percentage}%
-            </p>
-            <p className="text-[3vw] md:text-sm text-gray-500 mb-[4vh] md:mb-6">{message}</p>
+          {/* Boutons d'action (hors capture) */}
+          <CardContent className="p-[4vw] md:p-6 bg-white rounded-b-lg">
+            <p className="text-[3vw] md:text-sm text-gray-500 mb-[3vh] md:mb-4 text-center">{message}</p>
+
+            {/* Boutons capture et partage */}
+            <div className="flex gap-[2vw] md:gap-2 mb-[3vw] md:mb-4">
+              <Button
+                onClick={captureResult}
+                variant="outline"
+                className="flex-1 gap-[1vw] md:gap-2 border-blue-500 text-blue-600 hover:bg-blue-50 text-[3vw] md:text-sm"
+              >
+                <Camera className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
+                Capturer
+              </Button>
+              <Button
+                onClick={shareResult}
+                variant="outline"
+                className="flex-1 gap-[1vw] md:gap-2 border-green-500 text-green-600 hover:bg-green-50 text-[3vw] md:text-sm"
+              >
+                <Share2 className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
+                Partager
+              </Button>
+            </div>
 
             <div className="flex flex-col gap-[2vw] md:gap-3">
               <Button onClick={() => restartExercise(false)} className="gap-2 bg-gradient-to-r from-purple-500 to-pink-500">
@@ -664,6 +823,12 @@ export default function InteractiveExercise2({ onClose }: InteractiveExercise2Pr
               </div>
             </div>
             <div className="flex items-center gap-[2vw] md:gap-3">
+              {timerEnabled && isTimerRunning && (
+                <div className="flex items-center gap-[1vw] md:gap-1 bg-amber-500/90 px-[2vw] py-[1vw] md:px-3 md:py-1 rounded-full">
+                  <Timer className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
+                  <span className="font-mono font-bold text-[3.5vw] md:text-sm">{formatTime(elapsedTime)}</span>
+                </div>
+              )}
               <div className="flex items-center gap-[1vw] md:gap-1 bg-white/20 px-[2vw] py-[1vw] md:px-3 md:py-1 rounded-full">
                 <Trophy className="w-[4vw] h-[4vw] md:w-4 md:h-4" />
                 <span className="font-bold text-[3.5vw] md:text-sm">{score}/{answeredQuestions.length}</span>
